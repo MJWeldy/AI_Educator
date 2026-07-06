@@ -1,0 +1,660 @@
+slug: foundations-i
+title: Mathematical Foundations I
+description: >
+  Arithmetic through pre-algebra: whole numbers, integers, fractions, decimals,
+  ratios and percents, exponents, and first steps with variables and equations.
+sequence_order: 10
+units:
+  - title: Whole Numbers
+    topics:
+      - slug: place-value
+        title: Place value
+        description: Reading, writing, and decomposing whole numbers by place value.
+        est_minutes: 8
+        generators: [arithmetic.place_value]
+        lesson: |
+          Every digit in a number has a **place value** determined by its position.
+          In the number $4{,}736$:
+
+          | digit | place | value |
+          |---|---|---|
+          | 4 | thousands | $4000$ |
+          | 7 | hundreds | $700$ |
+          | 3 | tens | $30$ |
+          | 6 | ones | $6$ |
+
+          So $4{,}736 = 4000 + 700 + 30 + 6$. This is called **expanded form**.
+
+          Moving one place to the left multiplies the value by $10$; moving right divides by $10$.
+        worked_examples:
+          - problem: What is the value of the digit 8 in $28{,}405$?
+            solution: |
+              The 8 sits in the **thousands** place, so its value is $8 \times 1000 = 8000$.
+          - problem: Write $60{,}000 + 3{,}000 + 40 + 9$ as a single number.
+            solution: |
+              Fill each place: 6 ten-thousands, 3 thousands, 0 hundreds, 4 tens, 9 ones $= 63{,}049$.
+        resources:
+          - kind: reading
+            title: Khan Academy — Place value
+            url: https://www.khanacademy.org/math/arithmetic/arith-review-place-value
+      - slug: whole-add-sub
+        title: Adding and subtracting whole numbers
+        description: Multi-digit addition and subtraction with regrouping.
+        est_minutes: 10
+        generators: [arithmetic.add_sub]
+        prereqs: [place-value]
+        lesson: |
+          To add or subtract multi-digit numbers, line up the digits by place value and
+          work right to left, **regrouping** (carrying or borrowing) when a column
+          overflows or comes up short.
+
+          **Addition with carrying**: when a column sums to $10$ or more, write the ones
+          digit and carry the tens digit to the next column.
+
+          **Subtraction with borrowing**: when the top digit is smaller than the bottom,
+          borrow $1$ from the next place to the left (worth $10$ in the current column).
+        worked_examples:
+          - problem: Compute $478 + 256$.
+            solution: |
+              Ones: $8+6=14$ → write 4, carry 1.
+              Tens: $7+5+1=13$ → write 3, carry 1.
+              Hundreds: $4+2+1=7$.
+              Result: $734$.
+          - problem: Compute $703 - 168$.
+            solution: |
+              Ones: $3-8$ can't do — borrow: $13-8=5$ (tens becomes $-1$, borrow from hundreds: tens is $9$).
+              Tens: $9-6=3$. Hundreds: $6-1=5$.
+              Result: $535$.
+        resources:
+          - kind: reading
+            title: Khan Academy — Addition and subtraction
+            url: https://www.khanacademy.org/math/arithmetic/arith-review-add-subtract
+      - slug: whole-multiply
+        title: Multiplying whole numbers
+        description: Multi-digit multiplication.
+        est_minutes: 12
+        generators: [arithmetic.multiply]
+        prereqs: [whole-add-sub]
+        lesson: |
+          Multi-digit multiplication breaks a product into simpler pieces using place value.
+          To compute $34 \times 26$, split $26$ into $20 + 6$:
+
+          $$34 \times 26 = 34 \times 20 + 34 \times 6 = 680 + 204 = 884$$
+
+          The standard algorithm does exactly this, one row per digit of the second factor.
+          Keep track of a $0$ placeholder for each place you move left.
+        worked_examples:
+          - problem: Compute $57 \times 8$.
+            solution: |
+              $50 \times 8 = 400$ and $7 \times 8 = 56$, so $57 \times 8 = 400 + 56 = 456$.
+          - problem: Compute $123 \times 45$.
+            solution: |
+              $123 \times 40 = 4920$ and $123 \times 5 = 615$.
+              $4920 + 615 = 5535$.
+        resources:
+          - kind: reading
+            title: Khan Academy — Multiplication and division
+            url: https://www.khanacademy.org/math/arithmetic/arith-review-multiply-divide
+      - slug: whole-divide
+        title: Dividing whole numbers
+        description: Long division, quotients and remainders.
+        est_minutes: 12
+        generators: [arithmetic.divide]
+        prereqs: [whole-multiply]
+        lesson: |
+          Division asks: *how many groups?* $91 \div 7$ means "how many 7s fit in 91?"
+
+          **Long division** works place by place, left to right: divide, multiply,
+          subtract, bring down. When the divisor doesn't fit evenly, the amount left
+          over is the **remainder**.
+
+          $$91 \div 7 = 13 \qquad 94 \div 7 = 13 \text{ remainder } 3$$
+
+          Check your answer with multiplication: $7 \times 13 + 3 = 94$. ✓
+        worked_examples:
+          - problem: Compute $672 \div 4$.
+            solution: |
+              $6 \div 4 = 1$ r $2$ → bring down 7 → $27 \div 4 = 6$ r $3$ → bring down 2 → $32 \div 4 = 8$.
+              Result: $168$.
+          - problem: Compute $250 \div 6$, giving quotient and remainder.
+            solution: |
+              $6 \times 41 = 246$, and $250 - 246 = 4$. So quotient $41$, remainder $4$.
+      - slug: rounding-estimation
+        title: Rounding and estimation
+        description: Rounding to a given place; estimating sums and products.
+        est_minutes: 8
+        generators: [arithmetic.rounding]
+        prereqs: [place-value]
+      - slug: order-of-operations
+        title: Order of operations
+        description: Evaluating expressions with parentheses, exponents omitted (PEMDAS without E).
+        est_minutes: 10
+        generators: [arithmetic.order_of_operations]
+        prereqs: [whole-divide]
+        lesson: |
+          When an expression mixes operations, the **order of operations** decides what
+          happens first:
+
+          1. **P**arentheses
+          2. **M**ultiplication and **D**ivision, left to right
+          3. **A**ddition and **S**ubtraction, left to right
+
+          Multiplication does *not* beat division (nor addition beat subtraction) — ties
+          go left to right: $12 \div 4 \times 3 = 3 \times 3 = 9$, not $1$.
+        worked_examples:
+          - problem: Evaluate $5 + 3 \times 4$.
+            solution: |
+              Multiplication first: $3 \times 4 = 12$, then $5 + 12 = 17$.
+          - problem: Evaluate $(18 - 6) \div 3 + 2$.
+            solution: |
+              Parentheses: $18-6=12$. Division: $12 \div 3 = 4$. Then $4 + 2 = 6$.
+
+  - title: Integers
+    topics:
+      - slug: negative-numbers
+        title: Negative numbers and the number line
+        description: Ordering and interpreting negative numbers.
+        est_minutes: 8
+        generators: [integers.compare]
+        prereqs: [whole-add-sub]
+        lesson: |
+          Numbers less than zero are **negative**. On the number line they sit to the
+          left of $0$, mirroring the positives:
+
+          $$\cdots,\ -3,\ -2,\ -1,\ 0,\ 1,\ 2,\ 3,\ \cdots$$
+
+          **Further left = smaller.** So $-7 < -2$, even though $7 > 2$. Think of
+          temperature: $-7°$ is colder than $-2°$.
+        worked_examples:
+          - problem: "Order from least to greatest: $3, -5, 0, -1$."
+            solution: |
+              Leftmost on the number line first: $-5 < -1 < 0 < 3$.
+          - problem: Which is greater, $-12$ or $-4$?
+            solution: |
+              $-4$ is further right on the number line, so $-4 > -12$.
+        resources:
+          - kind: reading
+            title: Khan Academy — Negative numbers
+            url: https://www.khanacademy.org/math/arithmetic/arith-review-negative-numbers
+      - slug: integer-add-sub
+        title: Adding and subtracting integers
+        description: Sums and differences with negative numbers.
+        est_minutes: 12
+        generators: [integers.add_sub]
+        prereqs: [negative-numbers]
+        lesson: |
+          Two reliable rules:
+
+          - **Adding a negative = subtracting**: $5 + (-3) = 5 - 3 = 2$
+          - **Subtracting a negative = adding**: $5 - (-3) = 5 + 3 = 8$
+
+          When adding numbers with opposite signs, find the *difference* of their sizes
+          and keep the sign of the larger: $-9 + 4 = -5$ (difference 5, negative wins
+          because $9 > 4$).
+        worked_examples:
+          - problem: Compute $-7 + 12$.
+            solution: |
+              Opposite signs: difference is $12 - 7 = 5$; the larger size (12) is positive, so $+5$.
+          - problem: Compute $-4 - 9$.
+            solution: |
+              Subtracting 9 moves further left: $-4 - 9 = -13$.
+      - slug: integer-mul-div
+        title: Multiplying and dividing integers
+        description: Sign rules for products and quotients.
+        est_minutes: 10
+        generators: [integers.mul_div]
+        prereqs: [integer-add-sub, whole-divide]
+        lesson: |
+          The sign rules for multiplication and division:
+
+          | signs | result |
+          |---|---|
+          | $(+)(+)$ | positive |
+          | $(+)(-)$ | negative |
+          | $(-)(+)$ | negative |
+          | $(-)(-)$ | **positive** |
+
+          Same signs → positive. Different signs → negative. Count the negative factors:
+          an **even** number of them gives a positive result.
+        worked_examples:
+          - problem: Compute $(-6) \times 7$.
+            solution: |
+              Different signs → negative. $6 \times 7 = 42$, so the answer is $-42$.
+          - problem: Compute $(-48) \div (-8)$.
+            solution: |
+              Same signs → positive. $48 \div 8 = 6$, so the answer is $6$.
+      - slug: absolute-value
+        title: Absolute value
+        description: Distance from zero.
+        est_minutes: 6
+        generators: [integers.absolute_value]
+        prereqs: [negative-numbers]
+
+  - title: Factors & Multiples
+    topics:
+      - slug: divisibility-rules
+        title: Divisibility rules
+        description: Quick tests for divisibility by 2, 3, 4, 5, 6, 9, 10.
+        est_minutes: 8
+        generators: [numtheory.divisibility]
+        prereqs: [whole-divide]
+      - slug: primes-composites
+        title: Prime and composite numbers
+        description: Identifying primes; the sieve idea.
+        est_minutes: 8
+        generators: [numtheory.primes]
+        prereqs: [divisibility-rules]
+      - slug: prime-factorization
+        title: Prime factorization
+        description: Writing a number as a product of primes.
+        est_minutes: 10
+        generators: [numtheory.prime_factorization]
+        prereqs: [primes-composites]
+        lesson: |
+          Every whole number greater than 1 factors into primes in exactly one way
+          (the **Fundamental Theorem of Arithmetic**). Use a factor tree: split the
+          number into any two factors, then keep splitting until everything is prime.
+
+          $$60 = 6 \times 10 = (2 \times 3)(2 \times 5) = 2^2 \times 3 \times 5$$
+
+          Write repeated primes with exponents.
+        worked_examples:
+          - problem: Find the prime factorization of $84$.
+            solution: |
+              $84 = 2 \times 42 = 2 \times 2 \times 21 = 2 \times 2 \times 3 \times 7 = 2^2 \times 3 \times 7$.
+          - problem: Find the prime factorization of $135$.
+            solution: |
+              $135 = 5 \times 27 = 5 \times 3^3 = 3^3 \times 5$.
+      - slug: gcf
+        title: Greatest common factor
+        description: GCF via prime factorizations.
+        est_minutes: 10
+        generators: [numtheory.gcf]
+        prereqs: [prime-factorization]
+        lesson: |
+          The **greatest common factor** (GCF) of two numbers is the largest number
+          dividing both. From prime factorizations, take each shared prime with the
+          *smaller* exponent:
+
+          $$24 = 2^3 \times 3 \qquad 36 = 2^2 \times 3^2$$
+          $$\gcd(24, 36) = 2^2 \times 3 = 12$$
+        worked_examples:
+          - problem: Find $\gcd(18, 30)$.
+            solution: |
+              $18 = 2 \times 3^2$, $30 = 2 \times 3 \times 5$. Shared: one 2, one 3 → $\gcd = 6$.
+          - problem: Find $\gcd(28, 45)$.
+            solution: |
+              $28 = 2^2 \times 7$, $45 = 3^2 \times 5$. No shared primes → $\gcd = 1$ (they are *coprime*).
+      - slug: lcm
+        title: Least common multiple
+        description: LCM via prime factorizations.
+        est_minutes: 10
+        generators: [numtheory.lcm]
+        prereqs: [prime-factorization]
+
+  - title: Fractions
+    topics:
+      - slug: fraction-meaning
+        title: What fractions mean
+        description: Fractions as parts of a whole and as division.
+        est_minutes: 8
+        generators: [fractions.meaning]
+        prereqs: [whole-divide]
+        resources:
+          - kind: reading
+            title: Khan Academy — Fractions
+            url: https://www.khanacademy.org/math/arithmetic/fraction-arithmetic
+      - slug: equivalent-fractions
+        title: Equivalent fractions
+        description: Scaling numerator and denominator by the same factor.
+        est_minutes: 8
+        generators: [fractions.equivalent]
+        prereqs: [fraction-meaning]
+        lesson: |
+          Multiplying (or dividing) the numerator and denominator by the same nonzero
+          number produces an **equivalent fraction** — same value, different name:
+
+          $$\frac{2}{3} = \frac{2 \times 4}{3 \times 4} = \frac{8}{12}$$
+
+          Why? You're multiplying by $\frac{4}{4} = 1$, and multiplying by 1 changes nothing.
+        worked_examples:
+          - problem: "Fill in the blank: $\\dfrac{3}{5} = \\dfrac{?}{20}$."
+            solution: |
+              The denominator was multiplied by 4 ($5 \to 20$), so multiply the numerator by 4 too: $3 \times 4 = 12$.
+          - problem: Are $\dfrac{6}{8}$ and $\dfrac{9}{12}$ equivalent?
+            solution: |
+              Both reduce to $\dfrac{3}{4}$ (divide by 2, divide by 3). Yes — equivalent.
+      - slug: simplify-fractions
+        title: Simplifying fractions
+        description: Reducing to lowest terms with the GCF.
+        est_minutes: 8
+        generators: [fractions.simplify]
+        prereqs: [equivalent-fractions, gcf]
+      - slug: compare-fractions
+        title: Comparing fractions
+        description: Common denominators and benchmark comparisons.
+        est_minutes: 8
+        generators: [fractions.compare]
+        prereqs: [equivalent-fractions]
+      - slug: add-sub-like-fractions
+        title: Adding and subtracting like fractions
+        description: Same denominator — add the numerators.
+        est_minutes: 8
+        generators: [fractions.add_sub_like]
+        prereqs: [fraction-meaning]
+      - slug: add-sub-unlike-fractions
+        title: Adding and subtracting unlike fractions
+        description: Finding a common denominator first.
+        est_minutes: 12
+        generators: [fractions.add_sub_unlike]
+        prereqs: [add-sub-like-fractions, lcm, equivalent-fractions]
+        lesson: |
+          Fractions can only be added when they count the same-sized pieces — that is,
+          when denominators match. To add unlike fractions:
+
+          1. Find the **least common denominator** (the LCM of the denominators).
+          2. Rewrite each fraction with that denominator.
+          3. Add the numerators; keep the denominator; simplify.
+
+          $$\frac{1}{4} + \frac{1}{6} = \frac{3}{12} + \frac{2}{12} = \frac{5}{12}$$
+        worked_examples:
+          - problem: Compute $\dfrac{2}{3} + \dfrac{1}{5}$.
+            solution: |
+              LCD is 15: $\dfrac{10}{15} + \dfrac{3}{15} = \dfrac{13}{15}$.
+          - problem: Compute $\dfrac{5}{6} - \dfrac{3}{8}$.
+            solution: |
+              LCD of 6 and 8 is 24: $\dfrac{20}{24} - \dfrac{9}{24} = \dfrac{11}{24}$.
+      - slug: multiply-fractions
+        title: Multiplying fractions
+        description: Multiply across; cancel first when possible.
+        est_minutes: 10
+        generators: [fractions.multiply]
+        prereqs: [fraction-meaning, whole-multiply]
+        lesson: |
+          To multiply fractions, multiply numerators together and denominators together:
+
+          $$\frac{a}{b} \times \frac{c}{d} = \frac{ac}{bd}$$
+
+          **Cancel before multiplying** to keep numbers small: any numerator can cancel
+          with any denominator.
+
+          $$\frac{3}{8} \times \frac{4}{9} = \frac{\cancel{3}}{\cancel{8}_2} \times \frac{\cancel{4}}{\cancel{9}_3} = \frac{1}{2} \times \frac{1}{3} = \frac{1}{6}$$
+        worked_examples:
+          - problem: Compute $\dfrac{2}{5} \times \dfrac{3}{7}$.
+            solution: |
+              Multiply across: $\dfrac{2 \times 3}{5 \times 7} = \dfrac{6}{35}$. Nothing cancels.
+          - problem: Compute $\dfrac{5}{12} \times \dfrac{8}{15}$.
+            solution: |
+              Cancel 5 with 15 and 8 with 12: $\dfrac{1}{3} \times \dfrac{2}{3} = \dfrac{2}{9}$.
+      - slug: divide-fractions
+        title: Dividing fractions
+        description: Multiply by the reciprocal.
+        est_minutes: 10
+        generators: [fractions.divide]
+        prereqs: [multiply-fractions]
+        lesson: |
+          Dividing by a fraction is the same as multiplying by its **reciprocal**
+          (the fraction flipped):
+
+          $$\frac{a}{b} \div \frac{c}{d} = \frac{a}{b} \times \frac{d}{c}$$
+
+          Why? $\div \frac{1}{2}$ asks "how many halves fit?" — twice as many as wholes,
+          so dividing by $\frac{1}{2}$ doubles. Same as $\times \frac{2}{1}$.
+        worked_examples:
+          - problem: Compute $\dfrac{3}{4} \div \dfrac{2}{5}$.
+            solution: |
+              Flip and multiply: $\dfrac{3}{4} \times \dfrac{5}{2} = \dfrac{15}{8}$.
+          - problem: Compute $6 \div \dfrac{3}{2}$.
+            solution: |
+              $6 \times \dfrac{2}{3} = \dfrac{12}{3} = 4$.
+      - slug: mixed-numbers
+        title: Mixed numbers and improper fractions
+        description: Converting between the two forms.
+        est_minutes: 8
+        generators: [fractions.mixed_convert]
+        prereqs: [fraction-meaning]
+      - slug: mixed-number-ops
+        title: Operations with mixed numbers
+        description: Adding, subtracting, and multiplying mixed numbers.
+        est_minutes: 12
+        generators: [fractions.mixed_ops]
+        prereqs: [mixed-numbers, add-sub-unlike-fractions, multiply-fractions]
+
+  - title: Decimals
+    topics:
+      - slug: decimal-place-value
+        title: Decimal place value
+        description: Tenths, hundredths, thousandths; decimals as fractions.
+        est_minutes: 8
+        generators: [decimals.place_value]
+        prereqs: [place-value, fraction-meaning]
+      - slug: compare-round-decimals
+        title: Comparing and rounding decimals
+        description: Ordering decimals; rounding to a given place.
+        est_minutes: 8
+        generators: [decimals.compare_round]
+        prereqs: [decimal-place-value, rounding-estimation]
+      - slug: add-sub-decimals
+        title: Adding and subtracting decimals
+        description: Lining up the decimal point.
+        est_minutes: 8
+        generators: [decimals.add_sub]
+        prereqs: [decimal-place-value, whole-add-sub]
+        lesson: |
+          To add or subtract decimals, **line up the decimal points** so that matching
+          place values sit in the same column, padding with zeros as needed:
+
+          $$3.7 + 0.85 \;\to\; 3.70 + 0.85 = 4.55$$
+
+          Then add or subtract exactly as with whole numbers, keeping the decimal point
+          in place.
+        worked_examples:
+          - problem: Compute $12.4 + 3.75$.
+            solution: |
+              $12.40 + 3.75$: ones $12+3$, then $0.40+0.75 = 1.15$ → $15 + 1.15 = 16.15$.
+          - problem: Compute $5 - 1.36$.
+            solution: |
+              $5.00 - 1.36 = 3.64$ (borrow across the zeros).
+      - slug: multiply-decimals
+        title: Multiplying decimals
+        description: Multiply as whole numbers, then place the decimal point.
+        est_minutes: 10
+        generators: [decimals.multiply]
+        prereqs: [add-sub-decimals, whole-multiply]
+      - slug: divide-decimals
+        title: Dividing decimals
+        description: Shifting the decimal point; dividing by decimals.
+        est_minutes: 10
+        generators: [decimals.divide]
+        prereqs: [multiply-decimals, whole-divide]
+      - slug: fractions-to-decimals
+        title: Fractions and decimals
+        description: Converting in both directions; repeating decimals.
+        est_minutes: 10
+        generators: [decimals.from_fraction]
+        prereqs: [decimal-place-value, simplify-fractions]
+
+  - title: Ratio, Proportion & Percent
+    topics:
+      - slug: ratios
+        title: Ratios
+        description: Part-to-part and part-to-whole ratios; simplest form.
+        est_minutes: 8
+        generators: [ratio.basic]
+        prereqs: [fraction-meaning]
+        resources:
+          - kind: reading
+            title: Khan Academy — Ratios and proportions
+            url: https://www.khanacademy.org/math/pre-algebra/xb4832e56:rates-and-ratios
+      - slug: rates-unit-rates
+        title: Rates and unit rates
+        description: Per-unit comparisons; best-buy problems.
+        est_minutes: 10
+        generators: [ratio.unit_rate]
+        prereqs: [ratios, divide-decimals]
+      - slug: proportions
+        title: Proportions
+        description: Solving a/b = c/d with cross-multiplication.
+        est_minutes: 10
+        generators: [ratio.proportion]
+        prereqs: [ratios, equivalent-fractions]
+      - slug: percent-meaning
+        title: What percent means
+        description: Percent as "per hundred"; converting between percent, decimal, fraction.
+        est_minutes: 8
+        generators: [percent.meaning]
+        prereqs: [fractions-to-decimals]
+      - slug: percent-of-number
+        title: Percent of a number
+        description: Computing p% of n; finding the whole from a part.
+        est_minutes: 10
+        generators: [percent.of_number]
+        prereqs: [percent-meaning, multiply-decimals]
+        lesson: |
+          "**Percent**" means *per hundred*, so $p\%$ of a number is
+          $\frac{p}{100}$ times that number:
+
+          $$30\% \text{ of } 80 = 0.30 \times 80 = 24$$
+
+          Three related questions, one equation ($\text{part} = \text{percent} \times \text{whole}$):
+
+          - *What is 30% of 80?* → part $= 0.30 \times 80 = 24$
+          - *24 is what percent of 80?* → percent $= 24 \div 80 = 0.30 = 30\%$
+          - *24 is 30% of what?* → whole $= 24 \div 0.30 = 80$
+        worked_examples:
+          - problem: What is $15\%$ of $60$?
+            solution: |
+              $0.15 \times 60 = 9$.
+          - problem: $18$ is $40\%$ of what number?
+            solution: |
+              whole $= 18 \div 0.40 = 45$.
+      - slug: percent-change
+        title: Percent change
+        description: Percent increase and decrease.
+        est_minutes: 10
+        generators: [percent.change]
+        prereqs: [percent-of-number]
+
+  - title: Exponents & Roots
+    topics:
+      - slug: exponent-basics
+        title: Exponents
+        description: Repeated multiplication; powers of whole numbers.
+        est_minutes: 8
+        generators: [exponents.evaluate]
+        prereqs: [whole-multiply]
+      - slug: exponent-rules
+        title: Product and quotient rules for exponents
+        description: Adding and subtracting exponents with a common base.
+        est_minutes: 10
+        generators: [exponents.rules]
+        prereqs: [exponent-basics]
+      - slug: square-roots
+        title: Square roots
+        description: Perfect squares and estimating roots.
+        est_minutes: 8
+        generators: [roots.square_root]
+        prereqs: [exponent-basics]
+      - slug: scientific-notation
+        title: Scientific notation
+        description: Writing large and small numbers as a × 10^n.
+        est_minutes: 10
+        generators: [scinot.convert]
+        prereqs: [exponent-basics, multiply-decimals]
+
+  - title: Expressions & Equations
+    topics:
+      - slug: variables-expressions
+        title: Variables and expressions
+        description: Translating words to algebraic expressions.
+        est_minutes: 8
+        generators: [algebra.translate]
+        prereqs: [order-of-operations]
+      - slug: evaluate-expressions
+        title: Evaluating expressions
+        description: Substituting values into expressions.
+        est_minutes: 8
+        generators: [algebra.evaluate]
+        prereqs: [variables-expressions, integer-mul-div]
+      - slug: combine-like-terms
+        title: Combining like terms
+        description: Simplifying sums of terms.
+        est_minutes: 10
+        generators: [algebra.combine_like_terms]
+        prereqs: [variables-expressions]
+      - slug: distributive-property
+        title: The distributive property
+        description: Expanding a(b + c).
+        est_minutes: 10
+        generators: [algebra.distribute]
+        prereqs: [combine-like-terms, whole-multiply]
+      - slug: one-step-equations
+        title: One-step equations
+        description: Solving x + a = b and ax = b.
+        est_minutes: 10
+        generators: [algebra.one_step]
+        prereqs: [evaluate-expressions]
+        lesson: |
+          An **equation** states that two expressions are equal. To solve it, undo
+          whatever was done to the variable — and whatever you do to one side, do to
+          the other, keeping the balance.
+
+          - $x + 7 = 12$ → subtract 7 from both sides → $x = 5$
+          - $4x = 28$ → divide both sides by 4 → $x = 7$
+          - $\frac{x}{3} = 6$ → multiply both sides by 3 → $x = 18$
+
+          Always **check** by substituting back: $4 \times 7 = 28$. ✓
+        worked_examples:
+          - problem: Solve $x - 9 = 15$.
+            solution: |
+              Add 9 to both sides: $x = 24$.
+          - problem: Solve $-6x = 42$.
+            solution: |
+              Divide both sides by $-6$: $x = -7$.
+        resources:
+          - kind: reading
+            title: Khan Academy — One-step equations
+            url: https://www.khanacademy.org/math/pre-algebra/xb4832e56:one-step-and-two-step-equations-and-inequalities
+      - slug: two-step-equations
+        title: Two-step equations
+        description: Solving ax + b = c.
+        est_minutes: 12
+        generators: [algebra.two_step]
+        prereqs: [one-step-equations, distributive-property]
+        lesson: |
+          For an equation like $3x + 5 = 20$, undo operations in **reverse order** of
+          how they'd be applied: the $+5$ came last, so remove it first.
+
+          1. Subtract 5: $3x = 15$
+          2. Divide by 3: $x = 5$
+
+          If the equation has parentheses, like $2(x - 4) = 10$, either distribute
+          first or divide both sides by 2 first — both work.
+        worked_examples:
+          - problem: Solve $5x - 7 = 23$.
+            solution: |
+              Add 7: $5x = 30$. Divide by 5: $x = 6$.
+          - problem: Solve $\dfrac{x}{4} + 3 = 10$.
+            solution: |
+              Subtract 3: $\dfrac{x}{4} = 7$. Multiply by 4: $x = 28$.
+      - slug: intro-inequalities
+        title: Introduction to inequalities
+        description: Solving and graphing one-step inequalities.
+        est_minutes: 10
+        generators: [algebra.inequality]
+        prereqs: [one-step-equations]
+
+  - title: Geometry & Measurement
+    topics:
+      - slug: perimeter-area
+        title: Perimeter and area
+        description: Rectangles and triangles.
+        est_minutes: 10
+        generators: [geometry.perimeter_area]
+        prereqs: [whole-multiply, add-sub-decimals]
+      - slug: coordinate-plane
+        title: The coordinate plane
+        description: Plotting points in four quadrants.
+        est_minutes: 8
+        generators: [geometry.coordinate_plane]
+        prereqs: [negative-numbers]

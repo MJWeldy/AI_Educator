@@ -8,7 +8,11 @@ PLACE_NAMES = ["ones", "tens", "hundreds", "thousands", "ten-thousands", "hundre
 @generator("arithmetic.place_value")
 def place_value(rng: random.Random, difficulty: int) -> ProblemInstance:
     digits = {1: 3, 2: 4, 3: 6}[difficulty]
-    n = rng.randint(10 ** (digits - 1), 10**digits - 1)
+    # Distinct digits, so "the digit d" is unambiguous.
+    chosen = rng.sample(range(10), digits)
+    if chosen[0] == 0:
+        chosen[0], chosen[1] = chosen[1], chosen[0]
+    n = int("".join(map(str, chosen)))
     s = str(n)
     pos = rng.randrange(len(s))
     digit = int(s[pos])

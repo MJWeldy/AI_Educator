@@ -38,9 +38,14 @@ def list_courses(db: Session = Depends(get_db)):
     masteries = effective_masteries(db, graph, PROFILE_ID)
     courses = db.scalars(select(Course).order_by(Course.sequence_order)).all()
     by_course: dict[int, list[Topic]] = {}
-    for t in graph.topics.values():
+    for t in graph.topics.values():  # graph holds active topics only
         by_course.setdefault(t.course_id, []).append(t)
-    return [_summarize(c, masteries, by_course.get(c.id, [])) for c in courses]
+    return [
+        _summarize(c, masteries, by_course.get(c.id, []))
+        for c in courses
+        # Document courses stay hidden until review publishes their topics.
+        if c.source != "document" or by_course.get(c.id)
+    ]
 
 
 @router.get("/{slug}", response_model=CourseDetail)

@@ -16,7 +16,7 @@ def dec(value: Decimal) -> str:
 @generator("decimals.place_value")
 def place_value(rng: random.Random, difficulty: int) -> ProblemInstance:
     places = min(3, difficulty + 1)
-    digits = [rng.randint(1, 9) for _ in range(places)]
+    digits = rng.sample(range(1, 10), places)  # distinct → unambiguous
     whole = rng.randint(1, 99)
     s = f"{whole}." + "".join(map(str, digits))
     pos = rng.randrange(places)

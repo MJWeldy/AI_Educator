@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import ProfileSwitcher from './ProfileSwitcher'
 
 const links = [
   { to: '/', label: 'Today' },
@@ -23,6 +24,7 @@ export default function Layout() {
             </NavLink>
           ))}
         </nav>
+        <ProfileSwitcher />
         <div className="foot">local · offline-first</div>
       </aside>
       <main className="main">

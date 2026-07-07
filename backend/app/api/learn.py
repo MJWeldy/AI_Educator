@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from ..content import checking
 from ..content.serving import pick_problem, resolve_submission
 from ..db import get_db
+from .deps import current_profile_id
 from ..engine import xp
 from ..engine.graph import TopicGraph, effective_masteries
 from ..engine.mastery import fresh_progress, get_or_create_state, record_lesson_attempt
@@ -14,8 +15,6 @@ from ..models import Attempt, Lesson, Mastery, Topic, UserTopicState
 from ..schemas import LessonOut, WorkedExample
 
 router = APIRouter(prefix="/api/learn", tags=["learn"])
-
-PROFILE_ID = 1
 
 
 class ProblemOut(BaseModel):
@@ -89,17 +88,21 @@ def _lesson_out(db: Session, topic_id: int) -> LessonOut | None:
 
 
 @router.get("/{topic_id}", response_model=LearnState)
-def learn_state(topic_id: int, db: Session = Depends(get_db)):
+def learn_state(
+    topic_id: int,
+    db: Session = Depends(get_db),
+    profile_id: int = Depends(current_profile_id),
+):
     topic = db.get(Topic, topic_id)
     if topic is None:
         raise HTTPException(404, "topic not found")
     graph = TopicGraph.load(db)
-    masteries = effective_masteries(db, graph, PROFILE_ID)
+    masteries = effective_masteries(db, graph, profile_id)
     mastery = masteries.get(topic_id, Mastery.locked.value)
     if mastery == Mastery.locked.value:
         raise HTTPException(409, "topic is locked — finish its prerequisites first")
 
-    state = db.get(UserTopicState, (PROFILE_ID, topic_id))
+    state = db.get(UserTopicState, (profile_id, topic_id))
     progress = (state.lesson_progress if state else None) or fresh_progress()
 
     return LearnState(
@@ -114,7 +117,12 @@ def learn_state(topic_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/{topic_id}/attempt", response_model=AttemptOut)
-def submit_attempt(topic_id: int, body: AttemptIn, db: Session = Depends(get_db)):
+def submit_attempt(
+    topic_id: int,
+    body: AttemptIn,
+    db: Session = Depends(get_db),
+    profile_id: int = Depends(current_profile_id),
+):
     topic = db.get(Topic, topic_id)
     if topic is None:
         raise HTTPException(404, "topic not found")
@@ -130,7 +138,7 @@ def submit_attempt(topic_id: int, body: AttemptIn, db: Session = Depends(get_db)
         raise HTTPException(400, str(e))
     correct, part_results = checking.check_instance(parts, body.answers)
 
-    state = get_or_create_state(db, PROFILE_ID, topic_id)
+    state = get_or_create_state(db, profile_id, topic_id)
     was_learning = state.mastery == Mastery.learning.value
     events = (
         record_lesson_attempt(state, correct)
@@ -140,7 +148,7 @@ def submit_attempt(topic_id: int, body: AttemptIn, db: Session = Depends(get_db)
 
     db.add(
         Attempt(
-            profile_id=PROFILE_ID,
+            profile_id=profile_id,
             topic_id=topic_id,
             problem_id=body.problem_id,
             generator_key=body.generator_key,
@@ -159,7 +167,7 @@ def submit_attempt(topic_id: int, body: AttemptIn, db: Session = Depends(get_db)
     xp_awarded = 0
     if events["lesson_complete"]:
         xp_awarded = topic.est_minutes
-        xp.award(db, PROFILE_ID, xp_awarded, f"lesson:{topic.slug}")
+        xp.award(db, profile_id, xp_awarded, f"lesson:{topic.slug}")
         init_card(state)
 
     db.commit()

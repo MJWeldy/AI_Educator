@@ -11,6 +11,7 @@ from .api import (
     documents,
     learn,
     llm,
+    profiles,
     settings as settings_api,
     stats,
     tasks,
@@ -44,6 +45,7 @@ app.include_router(diagnostic.router)
 app.include_router(llm.router)
 app.include_router(settings_api.router)
 app.include_router(documents.router)
+app.include_router(profiles.router)
 
 
 @app.get("/api/health")

@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from ..content import checking
 from ..content.serving import resolve_submission
 from ..db import get_db
+from .deps import current_profile_id
 from ..engine import scheduler, srs, xp
 from ..engine.mastery import get_or_create_state
 from ..models import Attempt, Mastery, Task, Topic, UserTopicState
@@ -15,7 +16,6 @@ from ..schemas import LessonOut
 
 router = APIRouter(prefix="/api/tasks", tags=["tasks"])
 
-PROFILE_ID = 1
 SLOW_MS = 90_000
 
 
@@ -61,28 +61,28 @@ def _task_out(db: Session, task: Task) -> TaskOut:
 
 
 @router.get("/today", response_model=TodayOut)
-def today(db: Session = Depends(get_db)):
-    tasks = scheduler.build_today(db, PROFILE_ID)
-    _sync_lesson_tasks(db, tasks)
+def today(db: Session = Depends(get_db), profile_id: int = Depends(current_profile_id)):
+    tasks = scheduler.build_today(db, profile_id)
+    _sync_lesson_tasks(db, tasks, profile_id)
     from datetime import date
 
     day = date.today().isoformat()
     return TodayOut(
         date=day,
         daily_goal=xp.daily_goal(db),
-        xp_today=xp.xp_on(db, PROFILE_ID, day),
-        streak=xp.streak(db, PROFILE_ID),
+        xp_today=xp.xp_on(db, profile_id, day),
+        streak=xp.streak(db, profile_id),
         tasks=[_task_out(db, t) for t in tasks],
     )
 
 
-def _sync_lesson_tasks(db: Session, tasks: list[Task]) -> None:
+def _sync_lesson_tasks(db: Session, tasks: list[Task], profile_id: int) -> None:
     """Lesson tasks complete when their topic reaches learned (via the Learn page)."""
     dirty = False
     for task in tasks:
         if task.type != "lesson" or task.status == "done":
             continue
-        state = db.get(UserTopicState, (PROFILE_ID, task.topic_ids[0]))
+        state = db.get(UserTopicState, (profile_id, task.topic_ids[0]))
         if state and state.mastery in (Mastery.learned.value, Mastery.mastered.value):
             task.status = "done"
             task.xp_awarded = task.xp_value
@@ -115,9 +115,13 @@ class TaskDetail(BaseModel):
 
 
 @router.get("/{task_id}", response_model=TaskDetail)
-def task_detail(task_id: int, db: Session = Depends(get_db)):
+def task_detail(
+    task_id: int,
+    db: Session = Depends(get_db),
+    profile_id: int = Depends(current_profile_id),
+):
     task = db.get(Task, task_id)
-    if task is None:
+    if task is None or task.profile_id != profile_id:
         raise HTTPException(404, "task not found")
     problems = (task.payload or {}).get("problems", [])
     out = []
@@ -173,9 +177,14 @@ class TaskAttemptOut(BaseModel):
 
 
 @router.post("/{task_id}/attempt", response_model=TaskAttemptOut)
-def task_attempt(task_id: int, body: TaskAttemptIn, db: Session = Depends(get_db)):
+def task_attempt(
+    task_id: int,
+    body: TaskAttemptIn,
+    db: Session = Depends(get_db),
+    profile_id: int = Depends(current_profile_id),
+):
     task = db.get(Task, task_id)
-    if task is None:
+    if task is None or task.profile_id != profile_id:
         raise HTTPException(404, "task not found")
     payload = dict(task.payload or {})
     problems = list(payload.get("problems", []))
@@ -204,7 +213,7 @@ def task_attempt(task_id: int, body: TaskAttemptIn, db: Session = Depends(get_db
 
     db.add(
         Attempt(
-            profile_id=PROFILE_ID,
+            profile_id=profile_id,
             topic_id=p["topic_id"],
             task_id=task.id,
             problem_id=p.get("problem_id"),
@@ -222,7 +231,7 @@ def task_attempt(task_id: int, body: TaskAttemptIn, db: Session = Depends(get_db
     )
 
     # Feed the FSRS card for this topic.
-    state = get_or_create_state(db, PROFILE_ID, p["topic_id"])
+    state = get_or_create_state(db, profile_id, p["topic_id"])
     rating = srs.derive_rating(correct, body.hints_used, bool(body.time_ms and body.time_ms > SLOW_MS))
     srs.review(state, rating)
 
@@ -237,7 +246,7 @@ def task_attempt(task_id: int, body: TaskAttemptIn, db: Session = Depends(get_db
             bonus = round(5 * accuracy)
         xp_awarded = task.xp_value + bonus
         task.xp_awarded = xp_awarded
-        xp.award(db, PROFILE_ID, xp_awarded, f"{task.type}:{task.id}", task_id=task.id)
+        xp.award(db, profile_id, xp_awarded, f"{task.type}:{task.id}", task_id=task.id)
 
     db.commit()
 

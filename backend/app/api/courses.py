@@ -3,13 +3,12 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..db import get_db
+from .deps import current_profile_id
 from ..engine.graph import TopicGraph, effective_masteries
 from ..models import Course, Lesson, Mastery, Topic
 from ..schemas import CourseDetail, CourseSummary, TopicNode, UnitOut
 
 router = APIRouter(prefix="/api/courses", tags=["courses"])
-
-PROFILE_ID = 1
 
 
 def _summarize(course: Course, masteries: dict[int, str], topics: list[Topic]) -> dict:
@@ -33,9 +32,11 @@ def _summarize(course: Course, masteries: dict[int, str], topics: list[Topic]) -
 
 
 @router.get("", response_model=list[CourseSummary])
-def list_courses(db: Session = Depends(get_db)):
+def list_courses(
+    db: Session = Depends(get_db), profile_id: int = Depends(current_profile_id)
+):
     graph = TopicGraph.load(db)
-    masteries = effective_masteries(db, graph, PROFILE_ID)
+    masteries = effective_masteries(db, graph, profile_id)
     courses = db.scalars(select(Course).order_by(Course.sequence_order)).all()
     by_course: dict[int, list[Topic]] = {}
     for t in graph.topics.values():  # graph holds active topics only
@@ -49,12 +50,16 @@ def list_courses(db: Session = Depends(get_db)):
 
 
 @router.get("/{slug}", response_model=CourseDetail)
-def get_course(slug: str, db: Session = Depends(get_db)):
+def get_course(
+    slug: str,
+    db: Session = Depends(get_db),
+    profile_id: int = Depends(current_profile_id),
+):
     course = db.scalar(select(Course).where(Course.slug == slug))
     if course is None:
         raise HTTPException(404, "course not found")
     graph = TopicGraph.load(db)
-    masteries = effective_masteries(db, graph, PROFILE_ID)
+    masteries = effective_masteries(db, graph, profile_id)
 
     topics = sorted(
         (t for t in graph.topics.values() if t.course_id == course.id),

@@ -605,3 +605,52 @@ button {
 .xp-chart .col { flex: 1; height: 100%; display: flex; align-items: flex-end; }
 .xp-chart .bar { width: 100%; background: var(--blue); opacity: 0.75; min-height: 2px; }
 .xp-chart .bar.met { background: var(--gold); opacity: 1; }
+
+/* ── profile switcher ── */
+
+.profile-switcher { margin-top: auto; padding: 0 16px; }
+.profile-switcher + .foot { margin-top: 10px; }
+
+.profile-current {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  padding: 9px 10px;
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  text-align: left;
+}
+.profile-current:hover { border-color: var(--ink-soft); }
+.profile-current .dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--accent); flex-shrink: 0;
+}
+.profile-current .chev { margin-left: auto; color: var(--ink-faint); font-size: 10px; }
+
+.profile-panel {
+  border: 1px solid var(--rule);
+  border-bottom: none;
+  background: var(--paper-raised);
+}
+.profile-item {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  padding: 8px 10px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink-soft);
+  text-align: left;
+}
+.profile-item:hover { background: rgba(0,0,0,0.03); color: var(--ink); }
+.profile-item.active { color: var(--accent); }
+.profile-item .xp { color: var(--ink-faint); font-size: 11px; }
+.profile-new { padding: 8px; border-bottom: 1px solid var(--rule); }

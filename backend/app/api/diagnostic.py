@@ -7,13 +7,12 @@ from sqlalchemy.orm import Session
 from ..content import checking
 from ..content.serving import pick_problem, resolve_submission
 from ..db import get_db
+from .deps import current_profile_id
 from ..engine import diagnostic as diag
 from ..engine.graph import TopicGraph
 from ..models import Attempt, DiagnosticSession, Topic
 
 router = APIRouter(prefix="/api/diagnostic", tags=["diagnostic"])
-
-PROFILE_ID = 1
 
 
 class ProbeOut(BaseModel):
@@ -72,9 +71,13 @@ class StartIn(BaseModel):
 
 
 @router.post("/start", response_model=SessionOut)
-def start(body: StartIn, db: Session = Depends(get_db)):
+def start(
+    body: StartIn,
+    db: Session = Depends(get_db),
+    profile_id: int = Depends(current_profile_id),
+):
     graph = TopicGraph.load(db)
-    session = diag.start_session(db, PROFILE_ID, body.course_slugs, graph)
+    session = diag.start_session(db, profile_id, body.course_slugs, graph)
     if not session.belief:
         raise HTTPException(400, "no probeable topics in the chosen courses")
     return _session_out(db, session, graph)
@@ -96,7 +99,12 @@ class AnswerOut(BaseModel):
 
 
 @router.post("/{session_id}/answer", response_model=AnswerOut)
-def answer(session_id: int, body: AnswerIn, db: Session = Depends(get_db)):
+def answer(
+    session_id: int,
+    body: AnswerIn,
+    db: Session = Depends(get_db),
+    profile_id: int = Depends(current_profile_id),
+):
     session = db.get(DiagnosticSession, session_id)
     if session is None or session.status != "active":
         raise HTTPException(404, "no active session")
@@ -115,7 +123,7 @@ def answer(session_id: int, body: AnswerIn, db: Session = Depends(get_db)):
     correct, part_results = checking.check_instance(parts, body.answers)
     db.add(
         Attempt(
-            profile_id=PROFILE_ID,
+            profile_id=profile_id,
             topic_id=body.topic_id,
             problem_id=body.problem_id,
             generator_key=body.generator_key,

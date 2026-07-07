@@ -3,22 +3,25 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..db import get_db
+from .deps import current_profile_id
 from ..engine.graph import TopicGraph, effective_masteries
 from ..models import Lesson, Mastery, Topic
 from ..schemas import LessonOut, ResourceOut, TopicDetail, TopicNode, WorkedExample
 
 router = APIRouter(prefix="/api/topics", tags=["topics"])
 
-PROFILE_ID = 1
-
 
 @router.get("/{topic_id}", response_model=TopicDetail)
-def get_topic(topic_id: int, db: Session = Depends(get_db)):
+def get_topic(
+    topic_id: int,
+    db: Session = Depends(get_db),
+    profile_id: int = Depends(current_profile_id),
+):
     topic = db.get(Topic, topic_id)
     if topic is None:
         raise HTTPException(404, "topic not found")
     graph = TopicGraph.load(db)
-    masteries = effective_masteries(db, graph, PROFILE_ID)
+    masteries = effective_masteries(db, graph, profile_id)
 
     lesson = db.scalar(
         select(Lesson)

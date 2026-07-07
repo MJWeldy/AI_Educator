@@ -30,8 +30,14 @@ export default function TodayPage() {
     queryFn: () => api<TodayOut>('/api/tasks/today'),
     refetchOnMount: 'always',
   })
+  const { data: stats } = useQuery({
+    queryKey: ['stats'],
+    queryFn: () => api<{ attempts_total: number }>('/api/stats'),
+  })
 
   if (isLoading || !data) return <p className="muted">Loading…</p>
+
+  const brandNew = stats !== undefined && stats.attempts_total === 0
 
   const pct = Math.min(100, (100 * data.xp_today) / data.daily_goal)
   const goalMet = data.xp_today >= data.daily_goal
@@ -46,6 +52,13 @@ export default function TodayPage() {
         })}
       </div>
       <h1 className="page-title rise rise-1">Today</h1>
+
+      {brandNew && (
+        <div className="feedback-banner hint rise rise-1" style={{ marginBottom: 24 }}>
+          New here? Take the <Link to="/diagnostic">placement diagnostic</Link> so the
+          queue starts at your level instead of from scratch.
+        </div>
+      )}
 
       <div className="goal-bar rise rise-2">
         <div className="rail">

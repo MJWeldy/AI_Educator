@@ -15,6 +15,7 @@ import LearnPage from './pages/LearnPage'
 import TodayPage from './pages/TodayPage'
 import TaskPage from './pages/TaskPage'
 import StatsPage from './pages/StatsPage'
+import DiagnosticPage from './pages/DiagnosticPage'
 import Placeholder from './pages/Placeholder'
 
 const queryClient = new QueryClient({
@@ -41,6 +42,7 @@ const router = createBrowserRouter([
         ),
       },
       { path: '/stats', element: <StatsPage /> },
+      { path: '/diagnostic', element: <DiagnosticPage /> },
       {
         path: '/settings',
         element: (

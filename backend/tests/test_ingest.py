@@ -183,3 +183,68 @@ async def test_derive_and_generate_with_fake_llm(seeded_db, doc, monkeypatch):
 
     graph = TopicGraph.load(seeded_db)
     assert all(t.id not in graph.topics for t in topics)
+
+
+async def test_delete_document_removes_everything(seeded_db, doc, monkeypatch):
+    """Full cleanup: course, topics, content, edges, progress, sections."""
+    from fastapi.testclient import TestClient
+
+    from app.db import get_db
+    from app.engine.mastery import get_or_create_state
+    from app.main import app
+    from app.models import Attempt, Course, TopicEdge, UserTopicState
+
+    # Reuse the fake-LLM ingestion from the test above to build a course.
+    from app.ingest import derive, generate
+
+    topics_payload = {"topics": [{"title": "Advanced place value drills", "description": "d", "est_minutes": 10}]}
+    edges_payload = {"edges": [{"topic": 0, "requires": [], "requires_seed": ["place-value"]}]}
+    lesson_payload = {"content_md": "x", "worked_examples": [{"problem_md": "p", "solution_md": "s"}] * 2}
+    problems_payload = {"problems": [{
+        "statement_md": "1+1?", "parts": [{"prompt_md": "x", "answer_type": "numeric", "canonical": "2"}],
+        "solution_md": "", "difficulty": 1}]}
+
+    async def fake_cached(db_, choice, job_type, messages, schema, max_tokens=4096):
+        from app.llm.base import JobType
+        return {JobType.ingest_topics: topics_payload, JobType.topic_mapping: edges_payload,
+                JobType.ingest_lesson: lesson_payload, JobType.ingest_problems: problems_payload}[job_type]
+
+    class FakeChoice:
+        provider_name = model = "fake"
+
+    monkeypatch.setattr(derive, "cached_complete_json", fake_cached)
+    monkeypatch.setattr(generate, "cached_complete_json", fake_cached)
+    monkeypatch.setattr(derive.router, "resolve", lambda d, j: FakeChoice())
+    monkeypatch.setattr(generate.router, "resolve", lambda d, j: FakeChoice())
+
+    from app.ingest import extract, segment
+    extracted = extract.extract(doc)
+    segment.build_sections(seeded_db, doc, extracted)
+    course = await derive.derive_topics(seeded_db, doc)
+    await generate.generate_content(seeded_db, doc)
+
+    # Seed-weld edges from uploads must be soft (they must not lock the book).
+    topic = seeded_db.scalar(select(Topic).where(Topic.course_id == course.id))
+    weld = seeded_db.scalar(select(TopicEdge).where(TopicEdge.topic_id == topic.id))
+    assert weld is not None and weld.kind == "soft"
+
+    # Simulate some progress on a book topic.
+    get_or_create_state(seeded_db, 1, topic.id)
+    seeded_db.add(Attempt(profile_id=1, topic_id=topic.id, presented={}, user_answer={}))
+    seeded_db.commit()
+
+    def override_db():
+        yield seeded_db
+
+    app.dependency_overrides[get_db] = override_db
+    try:
+        with TestClient(app) as client:
+            assert client.delete(f"/api/documents/{doc.id}").status_code == 200
+    finally:
+        app.dependency_overrides.clear()
+
+    assert seeded_db.scalar(select(Course).where(Course.id == course.id)) is None
+    assert seeded_db.scalars(select(Topic).where(Topic.course_id == course.id)).all() == []
+    assert seeded_db.scalars(select(DocumentSection).where(DocumentSection.document_id == doc.id)).all() == []
+    assert seeded_db.get(Document, doc.id) is None
+    assert seeded_db.scalars(select(UserTopicState).where(UserTopicState.topic_id == topic.id)).all() == []

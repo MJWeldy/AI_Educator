@@ -116,6 +116,23 @@ export default function UploadPage() {
                     {d.status === 'review' ? 'Review & publish' : 'View'}
                   </Link>
                 )}
+                <button
+                  className="btn secondary danger"
+                  style={{ padding: '6px 12px', fontSize: 12, marginLeft: 8 }}
+                  title="Delete this book, its course, and all progress on it"
+                  onClick={async () => {
+                    if (
+                      !window.confirm(
+                        `Delete “${d.title || d.filename}”?\n\nThis removes the book, its derived course and topics, and any progress on them. This cannot be undone.`,
+                      )
+                    )
+                      return
+                    await api(`/api/documents/${d.id}`, { method: 'DELETE' })
+                    queryClient.invalidateQueries()
+                  }}
+                >
+                  Delete
+                </button>
               </span>
             </div>
           ))}

@@ -223,7 +223,9 @@ async def _derive_edges(db: Session, doc: Document, chapter, topics: list[Topic]
                 key = (seed_topic.id, dependent.id)
                 if key not in seen:
                     seen.add(key)
-                    db.add(TopicEdge(prereq_id=key[0], topic_id=key[1], kind="hard", source="document"))
+                    # Soft: welds the book into the curriculum graph without
+                    # locking it behind coursework — uploads are startable now.
+                    db.add(TopicEdge(prereq_id=key[0], topic_id=key[1], kind="soft", source="document"))
     # Drop any accidental cycles: keep the graph loadable.
     db.commit()
     from ..engine.graph import CycleError, TopicGraph

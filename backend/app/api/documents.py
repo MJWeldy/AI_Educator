@@ -162,6 +162,60 @@ def review(doc_id: int, db: Session = Depends(get_db)):
     )
 
 
+@router.delete("/{doc_id}")
+def delete_document(doc_id: int, db: Session = Depends(get_db)):
+    """Remove an uploaded book and everything derived from it: its course,
+    topics, lessons, problems, edges, and any per-profile progress on them."""
+    from ..models import Attempt, Resource, Task, UserTopicState
+
+    doc = db.get(Document, doc_id)
+    if doc is None:
+        raise HTTPException(404, "document not found")
+
+    course = db.scalar(select(Course).where(Course.document_id == doc.id))
+    if course is not None:
+        topic_ids = set(
+            db.scalars(select(Topic.id).where(Topic.course_id == course.id)).all()
+        )
+        problem_ids = set(
+            db.scalars(select(Problem.id).where(Problem.topic_id.in_(topic_ids))).all()
+        )
+        # FK-safe order: history → state → content → topics → course.
+        for model, cond in [
+            (Attempt, Attempt.topic_id.in_(topic_ids)),
+            (Attempt, Attempt.problem_id.in_(problem_ids)),
+            (UserTopicState, UserTopicState.topic_id.in_(topic_ids)),
+            (Resource, Resource.topic_id.in_(topic_ids)),
+            (Lesson, Lesson.topic_id.in_(topic_ids)),
+            (Problem, Problem.id.in_(problem_ids)),
+            (TopicEdge, TopicEdge.topic_id.in_(topic_ids) | TopicEdge.prereq_id.in_(topic_ids)),
+        ]:
+            for row in db.scalars(select(model).where(cond)):
+                db.delete(row)
+        # Pending tasks that point at these topics would break when served.
+        for task in db.scalars(select(Task).where(Task.status != "done")):
+            if any(tid in topic_ids for tid in (task.topic_ids or [])):
+                db.delete(task)
+        for topic in db.scalars(select(Topic).where(Topic.course_id == course.id)):
+            db.delete(topic)
+        db.delete(course)
+
+    sections = db.scalars(
+        select(DocumentSection).where(DocumentSection.document_id == doc.id)
+    ).all()
+    for section in (s for s in sections if s.parent_id is not None):  # children first
+        db.delete(section)
+    db.flush()
+    for section in (s for s in sections if s.parent_id is None):
+        db.delete(section)
+    stored = Path(doc.stored_path) if doc.stored_path else None
+    db.delete(doc)
+    db.commit()
+    if stored and stored.exists():
+        stored.unlink()
+    return {"ok": True}
+
+
 @router.delete("/{doc_id}/topics/{topic_id}")
 def delete_topic(doc_id: int, topic_id: int, db: Session = Depends(get_db)):
     topic = db.get(Topic, topic_id)

@@ -12,4 +12,8 @@ echo "== tsc =="
 echo "== vite build =="
 (cd frontend && npm run build)
 
+echo "== latex =="
+(cd backend && ../.venv/bin/python scripts/export_latex.py /tmp/educator-latex-check.json > /dev/null)
+(cd frontend && node scripts/check-katex.mjs /tmp/educator-latex-check.json)
+
 echo "All checks passed."

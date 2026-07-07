@@ -34,6 +34,9 @@ async def cached_complete_json(
             return json.loads(hit.response)
 
     result = await choice.provider.complete_json(messages, choice.model, schema, max_tokens=max_tokens)
+    from ..content.latex_repair import repair_tree
+
+    result = repair_tree(result)
 
     if key is not None:
         db.add(

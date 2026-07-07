@@ -16,6 +16,7 @@ import TodayPage from './pages/TodayPage'
 import TaskPage from './pages/TaskPage'
 import StatsPage from './pages/StatsPage'
 import DiagnosticPage from './pages/DiagnosticPage'
+import SettingsPage from './pages/SettingsPage'
 import Placeholder from './pages/Placeholder'
 
 const queryClient = new QueryClient({
@@ -43,15 +44,7 @@ const router = createBrowserRouter([
       },
       { path: '/stats', element: <StatsPage /> },
       { path: '/diagnostic', element: <DiagnosticPage /> },
-      {
-        path: '/settings',
-        element: (
-          <Placeholder
-            title="Settings"
-            note="AI providers (Ollama / Claude), daily goal, and preferences. Arrives in Phase 5."
-          />
-        ),
-      },
+      { path: '/settings', element: <SettingsPage /> },
     ],
   },
 ])

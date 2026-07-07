@@ -20,6 +20,7 @@ interface AttemptOut {
   correct: boolean
   part_results: PartResult[]
   solution_md: string
+  canonical: string[]
   events: { tier_advanced: boolean; lesson_complete: boolean; show_examples: boolean }
   progress: LearnState['progress']
   mastery: string
@@ -41,6 +42,20 @@ export default function LearnPage() {
   const [showExamples, setShowExamples] = useState(false)
   const [xpEarned, setXpEarned] = useState(0)
   const [startedAt, setStartedAt] = useState(Date.now())
+  const [generating, setGenerating] = useState(false)
+
+  const generateLesson = async () => {
+    setGenerating(true)
+    try {
+      const lesson = await api<LessonOut>(`/api/llm/topics/${topicId}/lesson`, { method: 'POST' })
+      setState((s) => (s ? { ...s, lesson } : s))
+      setPhase('reading')
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setGenerating(false)
+    }
+  }
 
   useEffect(() => {
     api<LearnState>(`/api/learn/${topicId}`)
@@ -57,7 +72,7 @@ export default function LearnPage() {
   if (error) return <p className="muted">{error}</p>
   if (!state) return <p className="muted">Loading…</p>
 
-  const submit = async (answers: string[]) => {
+  const submit = async (answers: string[], hintsUsed: number) => {
     if (!problem) return
     setSubmitting(true)
     try {
@@ -68,6 +83,7 @@ export default function LearnPage() {
           seed: problem.seed,
           difficulty: problem.difficulty,
           answers,
+          hints_used: hintsUsed,
           time_ms: Date.now() - startedAt,
         }),
       })
@@ -136,6 +152,19 @@ export default function LearnPage() {
 
       {phase === 'practice' && (
         <>
+          {!state.lesson && state.progress.done === 0 && (
+            <div className="feedback-banner hint rise" style={{ marginBottom: 18 }}>
+              This topic has no written lesson yet.{' '}
+              <button
+                className="btn secondary"
+                style={{ marginLeft: 10, padding: '4px 12px', fontSize: 12 }}
+                onClick={generateLesson}
+                disabled={generating}
+              >
+                {generating ? 'Writing… (can take a minute)' : 'Write one with AI'}
+              </button>
+            </div>
+          )}
           <div className="tier-track rise rise-2">
             <span>warm-up</span>
             {[1, 2, 3].map((t) => (

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Markdown from './Markdown'
 import MathInput from './MathInput'
+import { streamText } from '../api/stream'
 
 export interface ProblemPartPublic {
   prompt_md: string
@@ -24,13 +25,24 @@ export interface PartResult {
 interface Props {
   problem: ProblemPublic
   submitting: boolean
-  result: { correct: boolean; part_results: PartResult[]; solution_md: string } | null
-  onSubmit: (answers: string[]) => void
+  result: {
+    correct: boolean
+    part_results: PartResult[]
+    solution_md: string
+    canonical?: string[]
+  } | null
+  onSubmit: (answers: string[], hintsUsed: number) => void
   onNext: () => void
+  mode?: 'practice' | 'diagnostic'
 }
 
-export default function ProblemCard({ problem, submitting, result, onSubmit, onNext }: Props) {
+export default function ProblemCard({ problem, submitting, result, onSubmit, onNext, mode = 'practice' }: Props) {
   const [answers, setAnswers] = useState<string[]>(() => problem.parts.map(() => ''))
+  const [hintText, setHintText] = useState('')
+  const [hintBusy, setHintBusy] = useState(false)
+  const [hintsUsed, setHintsUsed] = useState(0)
+  const [explainText, setExplainText] = useState('')
+  const [explainBusy, setExplainBusy] = useState(false)
 
   const setAnswer = (i: number, v: string) => {
     setAnswers((prev) => prev.map((a, j) => (j === i ? v : a)))
@@ -40,7 +52,50 @@ export default function ProblemCard({ problem, submitting, result, onSubmit, onN
   const canSubmit = !submitting && !answered && answers.every((a) => a.trim() !== '')
 
   const submit = () => {
-    if (canSubmit) onSubmit(answers)
+    if (canSubmit) onSubmit(answers, hintsUsed)
+  }
+
+  const getHint = async () => {
+    setHintBusy(true)
+    setHintText('')
+    setHintsUsed((h) => h + 1)
+    try {
+      await streamText(
+        '/api/llm/hint',
+        {
+          statement_md: problem.statement_md,
+          parts: problem.parts,
+          wrong_answers: answers.some((a) => a.trim()) ? answers : null,
+        },
+        (chunk) => setHintText((t) => t + chunk),
+      )
+    } catch {
+      setHintText('Hint unavailable — is Ollama running?')
+    } finally {
+      setHintBusy(false)
+    }
+  }
+
+  const getExplanation = async () => {
+    if (!result?.canonical) return
+    setExplainBusy(true)
+    setExplainText('')
+    try {
+      await streamText(
+        '/api/llm/explain',
+        {
+          statement_md: problem.statement_md,
+          parts: problem.parts,
+          user_answers: answers,
+          canonical: result.canonical,
+        },
+        (chunk) => setExplainText((t) => t + chunk),
+      )
+    } catch {
+      setExplainText('Explanation unavailable — is Ollama running?')
+    } finally {
+      setExplainBusy(false)
+    }
   }
 
   return (
@@ -95,6 +150,13 @@ export default function ProblemCard({ problem, submitting, result, onSubmit, onN
         )
       })}
 
+      {hintText && (
+        <div className="solution-reveal" style={{ borderLeftColor: 'var(--blue)', background: 'rgba(46,93,116,0.06)' }}>
+          <div className="lbl" style={{ color: 'var(--blue)' }}>Hint</div>
+          <Markdown>{hintText}</Markdown>
+        </div>
+      )}
+
       {answered ? (
         <>
           <div className={`feedback-banner ${result.correct ? 'good' : 'bad'}`}>
@@ -106,14 +168,34 @@ export default function ProblemCard({ problem, submitting, result, onSubmit, onN
               <Markdown>{result.solution_md}</Markdown>
             </div>
           )}
-          <button className="btn" onClick={onNext} autoFocus>
-            Next problem →
-          </button>
+          {explainText && (
+            <div className="solution-reveal" style={{ borderLeftColor: 'var(--blue)', background: 'rgba(46,93,116,0.06)' }}>
+              <div className="lbl" style={{ color: 'var(--blue)' }}>Tutor</div>
+              <Markdown>{explainText}</Markdown>
+            </div>
+          )}
+          <div style={{ display: 'flex', gap: 12 }}>
+            <button className="btn" onClick={onNext} autoFocus>
+              Next problem →
+            </button>
+            {!result.correct && mode === 'practice' && result.canonical && !explainText && (
+              <button className="btn secondary" onClick={getExplanation} disabled={explainBusy}>
+                {explainBusy ? 'Thinking…' : 'Explain my mistake'}
+              </button>
+            )}
+          </div>
         </>
       ) : (
-        <button className="btn" onClick={submit} disabled={!canSubmit}>
-          {submitting ? 'Checking…' : 'Check answer'}
-        </button>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <button className="btn" onClick={submit} disabled={!canSubmit}>
+            {submitting ? 'Checking…' : 'Check answer'}
+          </button>
+          {mode === 'practice' && (
+            <button className="btn secondary" onClick={getHint} disabled={hintBusy}>
+              {hintBusy ? 'Thinking…' : hintText ? 'Another hint' : 'Get a hint'}
+            </button>
+          )}
+        </div>
       )}
     </div>
   )

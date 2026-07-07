@@ -154,6 +154,7 @@ class TaskAttemptOut(BaseModel):
     correct: bool
     part_results: list[dict]
     solution_md: str
+    canonical: list[str]
     task_status: str
     task_complete: bool
     xp_awarded: int
@@ -237,6 +238,7 @@ def task_attempt(task_id: int, body: TaskAttemptIn, db: Session = Depends(get_db
         correct=correct,
         part_results=part_results,
         solution_md=inst.solution_md,
+        canonical=[pt["canonical"] for pt in parts],
         task_status=task.status,
         task_complete=task_complete,
         xp_awarded=xp_awarded,

@@ -24,6 +24,7 @@ interface TaskAttemptOut {
   correct: boolean
   part_results: PartResult[]
   solution_md: string
+  canonical: string[]
   task_status: string
   task_complete: boolean
   xp_awarded: number
@@ -58,13 +59,18 @@ export default function TaskPage() {
   const current = index === null ? null : task.problems[index]
   const finished = task.status === 'done' || index === null
 
-  const submit = async (answers: string[]) => {
+  const submit = async (answers: string[], hintsUsed: number) => {
     if (!current) return
     setSubmitting(true)
     try {
       const out = await api<TaskAttemptOut>(`/api/tasks/${task.id}/attempt`, {
         method: 'POST',
-        body: JSON.stringify({ index: current.index, answers, time_ms: Date.now() - startedAt }),
+        body: JSON.stringify({
+          index: current.index,
+          answers,
+          hints_used: hintsUsed,
+          time_ms: Date.now() - startedAt,
+        }),
       })
       setResult(out)
       if (out.correct) setCorrectCount((c) => c + 1)

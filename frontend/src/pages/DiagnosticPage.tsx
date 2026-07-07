@@ -51,7 +51,7 @@ export default function DiagnosticPage() {
     }
   }
 
-  const submit = async (answers: string[]) => {
+  const submit = async (answers: string[], _hintsUsed: number) => {
     if (!session?.probe) return
     setBusy(true)
     try {
@@ -128,6 +128,7 @@ export default function DiagnosticPage() {
             result={result}
             onSubmit={submit}
             onNext={() => {}}
+            mode="diagnostic"
           />
         </div>
       </>

@@ -44,3 +44,19 @@ the ability to upload a textbook PDF and have the app turn it into a course.
 
 All state lives in `data/` (gitignored): the SQLite DB, uploaded PDFs, and
 extraction artifacts.
+
+## Durability
+
+- **Schema migrations**: the database schema is managed by Alembic. On startup the
+  app backs up the DB (if a migration is pending), then upgrades to head — your
+  learning history survives schema changes. After editing `app/models.py`, run
+  `cd backend && ../.venv/bin/alembic revision --autogenerate -m "what changed"`
+  and review the generated file; `tests/test_maintenance.py` fails if models and
+  migrations ever drift apart.
+- **Backups**: `data/backups/` keeps the 14 most recent snapshots (taken at
+  startup, throttled to every 6 hours; always taken before a migration).
+- **Pinned dependencies**: reproduce the exact environment with
+  `pip install -r backend/requirements.lock`.
+- **Curriculum map**: `docs/course-map.html` is a standalone visual of every
+  course and prerequisite; regenerate with
+  `backend/scripts/export_course_map.py` after curriculum changes.

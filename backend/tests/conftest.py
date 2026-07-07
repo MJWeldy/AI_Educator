@@ -1,3 +1,7 @@
+import os
+
+os.environ["EDUCATOR_TESTING"] = "1"  # must precede any app import
+
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker

@@ -10,6 +10,7 @@ SEED_DIR = BACKEND_DIR / "app" / "content" / "seed"
 
 class Settings(BaseSettings):
     database_url: str = f"sqlite:///{DATA_DIR / 'educator.db'}"
+    testing: bool = False  # set by conftest: skips startup side effects
     uploads_dir: Path = DATA_DIR / "uploads"
     extracted_dir: Path = DATA_DIR / "extracted"
     ollama_base_url: str = "http://localhost:11434"

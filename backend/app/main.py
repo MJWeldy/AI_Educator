@@ -20,14 +20,23 @@ from .api import (
 from .ingest import pipeline  # noqa: F401 — registers the ingest_document job handler
 from .config import settings
 from .content.loader import load_seed
-from .db import Base, SessionLocal, engine
+from .db import SessionLocal
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     import asyncio
 
-    Base.metadata.create_all(engine)
+    if settings.testing:
+        # Tests supply their own in-memory DB via dependency overrides;
+        # never touch the real data directory from the test suite.
+        yield
+        return
+
+    from . import maintenance
+
+    maintenance.backup_database()
+    maintenance.run_migrations()
     with SessionLocal() as db:
         load_seed(db)
     jobs.set_loop(asyncio.get_running_loop())

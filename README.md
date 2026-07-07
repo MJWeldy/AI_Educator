@@ -27,10 +27,16 @@ diagnostic so the daily queue starts at your level.
 Day-to-day scripts:
 
 ```bash
-./run.sh      # production mode: everything on :8700
-./dev.sh      # development: backend :8700 with reload, frontend :5180 with HMR
-./check.sh    # verification gate: pytest + tsc + vite build
+./run.sh        # production mode: everything on :8700 (this machine only)
+./run.sh --lan  # also reachable from other devices on your home network
+./dev.sh        # development: backend :8700 with reload, frontend :5180 with HMR
+./check.sh      # verification gate: pytest + tsc + vite build + KaTeX compile
 ```
+
+With `--lan`, open `http://<this-machine's-IP>:8700` from any phone, tablet, or
+laptop on the same network (the script prints the exact URL). There is no
+authentication — anyone on the network can use the app and switch profiles —
+so keep it to trusted home networks.
 
 ## What's inside
 

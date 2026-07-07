@@ -11,6 +11,7 @@ import Layout from './components/Layout'
 import CoursesPage from './pages/CoursesPage'
 import CourseMapPage from './pages/CourseMapPage'
 import TopicPage from './pages/TopicPage'
+import LearnPage from './pages/LearnPage'
 import Placeholder from './pages/Placeholder'
 
 const queryClient = new QueryClient({
@@ -33,15 +34,7 @@ const router = createBrowserRouter([
       { path: '/courses', element: <CoursesPage /> },
       { path: '/courses/:slug', element: <CourseMapPage /> },
       { path: '/topics/:topicId', element: <TopicPage /> },
-      {
-        path: '/learn/:topicId',
-        element: (
-          <Placeholder
-            title="Learn"
-            note="The interactive lesson player — scaffolded practice with instant checking — arrives in Phase 2."
-          />
-        ),
-      },
+      { path: '/learn/:topicId', element: <LearnPage /> },
       {
         path: '/upload',
         element: (

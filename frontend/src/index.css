@@ -381,3 +381,136 @@ button {
 
 /* KaTeX sizing harmony */
 .katex { font-size: 1.02em; }
+
+/* ── learn page ── */
+
+.tier-track {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  margin-bottom: 26px;
+}
+.tier-track .tier {
+  flex: 1;
+  height: 8px;
+  border: 1px solid var(--rule);
+  background: var(--paper-sunken);
+  position: relative;
+  overflow: hidden;
+}
+.tier-track .tier .fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--blue);
+  transition: width 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.tier-track .tier.passed .fill { background: var(--green); width: 100% !important; }
+
+.problem-card {
+  border: 1.5px solid var(--ink);
+  background: var(--paper-raised);
+  box-shadow: 5px 5px 0 rgba(34, 29, 21, 0.1);
+  padding: 26px 30px 24px;
+  margin-bottom: 22px;
+}
+.problem-card .statement { font-size: 18.5px; margin-bottom: 18px; }
+.problem-card .statement p { margin: 0 0 8px; }
+
+.part-block { margin: 16px 0; }
+.part-block .prompt { font-size: 16px; margin-bottom: 8px; }
+.part-block .prompt p { margin: 0; }
+
+.answer-input {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  padding: 9px 13px;
+  border: 1.5px solid var(--ink-soft);
+  background: var(--paper);
+  color: var(--ink);
+  width: 260px;
+  outline: none;
+}
+.answer-input:focus { border-color: var(--accent); box-shadow: 2px 2px 0 var(--accent-soft); }
+.answer-input.correct { border-color: var(--green); background: var(--green-soft); }
+.answer-input.incorrect { border-color: var(--accent); background: var(--accent-soft); }
+
+.input-preview {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--ink-soft);
+  min-height: 22px;
+}
+.input-preview .lbl {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-right: 8px;
+  color: var(--ink-faint);
+}
+
+.choices { display: flex; flex-direction: column; gap: 8px; }
+.choice {
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 16px;
+  padding: 10px 16px;
+  background: var(--paper);
+  border: 1.5px solid var(--rule);
+  transition: border-color 100ms, background 100ms;
+}
+.choice:hover { border-color: var(--ink-soft); }
+.choice.selected { border-color: var(--ink); background: var(--paper-sunken); box-shadow: 2px 2px 0 rgba(34,29,21,0.15); }
+.choice.correct { border-color: var(--green); background: var(--green-soft); }
+.choice.incorrect { border-color: var(--accent); background: var(--accent-soft); }
+
+.feedback-banner {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  padding: 10px 16px;
+  margin: 14px 0;
+  border: 1.5px solid;
+}
+.feedback-banner.good { color: var(--green); border-color: var(--green); background: var(--green-soft); }
+.feedback-banner.bad { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+.feedback-banner.hint { color: var(--blue); border-color: var(--blue); background: var(--blue-soft); }
+
+.solution-reveal {
+  border-left: 3px solid var(--green);
+  background: rgba(61, 107, 53, 0.06);
+  padding: 12px 18px;
+  margin: 14px 0;
+  font-size: 16px;
+}
+.solution-reveal .lbl {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--green);
+}
+
+@keyframes pop {
+  0% { transform: scale(0.96); opacity: 0; }
+  60% { transform: scale(1.02); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.complete-card {
+  animation: pop 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  border: 2px solid var(--gold);
+  background: var(--gold-soft);
+  box-shadow: 6px 6px 0 rgba(169, 123, 28, 0.25);
+  padding: 34px 38px;
+  text-align: center;
+}
+.complete-card h2 { font-size: 30px; margin-bottom: 8px; }
+.complete-card .xp {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  color: var(--gold);
+  letter-spacing: 0.08em;
+}

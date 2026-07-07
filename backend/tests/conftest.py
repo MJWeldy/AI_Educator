@@ -1,13 +1,20 @@
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
 from app.db import Base
 
 
 @pytest.fixture()
 def db():
-    engine = create_engine("sqlite://")  # in-memory
+    # StaticPool + check_same_thread=False: one shared in-memory DB that
+    # survives TestClient's worker threads.
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
     Base.metadata.create_all(engine)
     SessionLocal = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
     session = SessionLocal()

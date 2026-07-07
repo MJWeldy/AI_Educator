@@ -24,9 +24,12 @@ from .db import Base, SessionLocal, engine
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    import asyncio
+
     Base.metadata.create_all(engine)
     with SessionLocal() as db:
         load_seed(db)
+    jobs.set_loop(asyncio.get_running_loop())
     jobs.resume_pending()
     yield
 

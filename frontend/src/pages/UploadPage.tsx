@@ -99,6 +99,18 @@ export default function UploadPage() {
                 </div>
               </div>
               <span className="task-xp">
+                {d.progress?.job_status === 'failed' && !['review', 'published'].includes(d.status) && (
+                  <button
+                    className="btn secondary"
+                    style={{ padding: '6px 14px', fontSize: 12 }}
+                    onClick={async () => {
+                      await api(`/api/documents/${d.id}/retry`, { method: 'POST' })
+                      queryClient.invalidateQueries({ queryKey: ['documents'] })
+                    }}
+                  >
+                    Retry
+                  </button>
+                )}
                 {(d.status === 'review' || d.status === 'published') && (
                   <Link to={`/documents/${d.id}`} className="btn secondary" style={{ padding: '6px 14px', fontSize: 12 }}>
                     {d.status === 'review' ? 'Review & publish' : 'View'}

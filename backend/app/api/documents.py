@@ -192,6 +192,25 @@ def delete_problem(doc_id: int, problem_id: int, db: Session = Depends(get_db)):
     return {"ok": True}
 
 
+@router.post("/{doc_id}/retry", response_model=DocumentOut)
+def retry(doc_id: int, db: Session = Depends(get_db)):
+    """Re-enqueue ingestion; completed stages are checkpointed so this resumes."""
+    doc = db.get(Document, doc_id)
+    if doc is None:
+        raise HTTPException(404, "document not found")
+    if doc.status in ("review", "published"):
+        raise HTTPException(409, "document already ingested")
+    active = db.scalar(
+        select(Job).where(Job.kind == "ingest_document", Job.status.in_(["queued", "running"]))
+    )
+    if active is not None and active.payload.get("document_id") == doc.id:
+        raise HTTPException(409, "ingestion already running")
+    doc.error = None
+    db.commit()
+    jobs.enqueue(db, "ingest_document", {"document_id": doc.id})
+    return _doc_out(db, doc)
+
+
 @router.post("/{doc_id}/publish", response_model=DocumentOut)
 def publish(doc_id: int, db: Session = Depends(get_db)):
     doc = db.get(Document, doc_id)

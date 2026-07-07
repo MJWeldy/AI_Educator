@@ -20,6 +20,13 @@ log = logging.getLogger("educator.jobs")
 
 HANDLERS: dict[str, Callable[[int], Awaitable[None]]] = {}
 _tasks: set[asyncio.Task] = set()
+_loop: asyncio.AbstractEventLoop | None = None
+
+
+def set_loop(loop: asyncio.AbstractEventLoop) -> None:
+    """Called at startup so sync endpoints (threadpool) can still spawn jobs."""
+    global _loop
+    _loop = loop
 
 
 def handler(kind: str):
@@ -39,7 +46,14 @@ def enqueue(db, kind: str, payload: dict) -> Job:
 
 
 def _spawn(job_id: int) -> None:
-    task = asyncio.create_task(_execute(job_id))
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        if _loop is None:
+            raise
+        asyncio.run_coroutine_threadsafe(_execute(job_id), _loop)
+        return
+    task = loop.create_task(_execute(job_id))
     _tasks.add(task)
     task.add_done_callback(_tasks.discard)
 

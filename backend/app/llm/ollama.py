@@ -21,7 +21,9 @@ class OllamaProvider:
     def __init__(self, base_url: str | None = None):
         self.base_url = (base_url or settings.ollama_base_url).rstrip("/")
 
-    async def _chat(self, payload: dict, timeout: float = 300.0) -> dict:
+    # Local reasoning models can spend many minutes on one constrained-JSON
+    # generation; the jobs that use this are background jobs, so wait long.
+    async def _chat(self, payload: dict, timeout: float = 900.0) -> dict:
         try:
             async with httpx.AsyncClient(timeout=timeout) as client:
                 r = await client.post(f"{self.base_url}/api/chat", json=payload)

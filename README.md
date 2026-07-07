@@ -13,6 +13,27 @@ the ability to upload a textbook PDF and have the app turn it into a course.
 ./check.sh  # verification gate: pytest + tsc + vite build
 ```
 
+## What's inside
+
+- **13 built-in courses, ~340 topics**: arithmetic → pre-algebra → algebra →
+  precalc/calculus → Methods of Proof, Linear Algebra, Multivariable Calculus,
+  Discrete Math, Abstract Algebra, Probability & Statistics, Differential
+  Equations, Math for ML, and Mathematical Methods for the Physical Sciences I/II,
+  all in one prerequisite graph.
+- **Learn loop**: lessons with worked examples, then scaffolded practice through
+  3 difficulty tiers. ~46 procedural problem generators with exact sympy-checked
+  answers cover the foundations; advanced topics get AI-written lessons and
+  AI-generated (statically verified) problem sets on demand.
+- **Retention**: FSRS spaced repetition per topic, a daily queue (due reviews →
+  quizzes → new frontier lessons), XP, daily goals, and streaks.
+- **Placement diagnostic**: ~25 adaptive questions find your knowledge frontier
+  so you skip what you already know.
+- **Upload a textbook**: PDF → extract → segment → LLM-derived topic graph welded
+  into the curriculum → lessons + problems (with answer verification) → your
+  review → published course, taught by the same engine.
+- **AI hints & explanations** during practice, streamed from your local Ollama
+  (or Claude if configured).
+
 ## Stack
 
 - **Backend**: FastAPI + SQLite (SQLAlchemy), sympy answer checking, py-fsrs

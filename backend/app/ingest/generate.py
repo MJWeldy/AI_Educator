@@ -17,8 +17,8 @@ PROBLEMS_SCHEMA = {
     "properties": {
         "problems": {
             "type": "array",
-            "minItems": 4,
-            "maxItems": 8,
+            "minItems": 3,
+            "maxItems": 6,
             "items": {
                 "type": "object",
                 "properties": {

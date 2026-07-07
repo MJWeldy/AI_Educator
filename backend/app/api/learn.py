@@ -1,12 +1,10 @@
-import random
-
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..content import checking
-from ..content.generators import REGISTRY, make_instance
+from ..content.serving import pick_problem, resolve_submission
 from ..db import get_db
 from ..engine import xp
 from ..engine.graph import TopicGraph, effective_masteries
@@ -21,8 +19,9 @@ PROFILE_ID = 1
 
 
 class ProblemOut(BaseModel):
-    generator_key: str
-    seed: int
+    problem_id: int | None = None
+    generator_key: str | None = None
+    seed: int | None = None
     difficulty: int
     statement_md: str
     parts: list[dict]
@@ -39,9 +38,10 @@ class LearnState(BaseModel):
 
 
 class AttemptIn(BaseModel):
-    generator_key: str
-    seed: int
-    difficulty: int
+    problem_id: int | None = None
+    generator_key: str | None = None
+    seed: int | None = None
+    difficulty: int = 1
     answers: list[str]
     time_ms: int | None = None
     hints_used: int = 0
@@ -59,22 +59,17 @@ class AttemptOut(BaseModel):
     next_problem: ProblemOut | None
 
 
-def _next_problem(topic: Topic, progress: dict, rng: random.Random | None = None) -> ProblemOut | None:
-    keys = [k for k in topic.generator_keys if k in REGISTRY]
-    if not keys:
+def _next_problem(db: Session, topic: Topic, progress: dict) -> ProblemOut | None:
+    served = pick_problem(db, topic, int(progress.get("tier", 1)))
+    if served is None:
         return None
-    rng = rng or random.Random()
-    key = rng.choice(keys)
-    seed = rng.randrange(1, 2**31)
-    difficulty = int(progress.get("tier", 1))
-    inst = make_instance(key, seed, difficulty)
-    pub = inst.public_dict()
     return ProblemOut(
-        generator_key=key,
-        seed=seed,
-        difficulty=difficulty,
-        statement_md=pub["statement_md"],
-        parts=pub["parts"],
+        problem_id=served.problem_id,
+        generator_key=served.generator_key,
+        seed=served.seed,
+        difficulty=served.difficulty,
+        statement_md=served.statement_md,
+        parts=served.parts_public,
     )
 
 
@@ -114,7 +109,7 @@ def learn_state(topic_id: int, db: Session = Depends(get_db)):
         mastery=mastery,
         progress=progress,
         lesson=_lesson_out(db, topic_id),
-        problem=_next_problem(topic, progress),
+        problem=_next_problem(db, topic, progress),
     )
 
 
@@ -123,20 +118,16 @@ def submit_attempt(topic_id: int, body: AttemptIn, db: Session = Depends(get_db)
     topic = db.get(Topic, topic_id)
     if topic is None:
         raise HTTPException(404, "topic not found")
-    if body.generator_key not in REGISTRY:
-        raise HTTPException(400, f"unknown generator {body.generator_key!r}")
-
-    inst = make_instance(body.generator_key, body.seed, body.difficulty)
-    parts = [
-        {
-            "prompt_md": p.prompt_md,
-            "answer_type": p.answer_type,
-            "canonical": p.canonical,
-            "tolerance": p.tolerance,
-            "choices": p.choices,
-        }
-        for p in inst.parts
-    ]
+    try:
+        parts, presented, solution_md = resolve_submission(
+            db,
+            problem_id=body.problem_id,
+            generator_key=body.generator_key,
+            seed=body.seed,
+            difficulty=body.difficulty,
+        )
+    except KeyError as e:
+        raise HTTPException(400, str(e))
     correct, part_results = checking.check_instance(parts, body.answers)
 
     state = get_or_create_state(db, PROFILE_ID, topic_id)
@@ -151,10 +142,11 @@ def submit_attempt(topic_id: int, body: AttemptIn, db: Session = Depends(get_db)
         Attempt(
             profile_id=PROFILE_ID,
             topic_id=topic_id,
+            problem_id=body.problem_id,
             generator_key=body.generator_key,
             seed=body.seed,
             difficulty=body.difficulty,
-            presented=inst.to_dict(),
+            presented=presented,
             user_answer={"answers": body.answers},
             correct=correct,
             part_results=part_results,
@@ -172,12 +164,12 @@ def submit_attempt(topic_id: int, body: AttemptIn, db: Session = Depends(get_db)
 
     db.commit()
 
-    next_problem = None if events["lesson_complete"] else _next_problem(topic, state.lesson_progress)
+    next_problem = None if events["lesson_complete"] else _next_problem(db, topic, state.lesson_progress)
     return AttemptOut(
         correct=correct,
         part_results=part_results,
-        solution_md=inst.solution_md,
-        canonical=[p["canonical"] for p in parts],
+        solution_md=solution_md,
+        canonical=[str(p["canonical"]) for p in parts],
         events=events,
         progress=state.lesson_progress,
         mastery=state.mastery,

@@ -1,0 +1,252 @@
+slug: foundations-iii
+title: Mathematical Foundations III
+description: >
+  Precalculus and single-variable calculus: trigonometry, complex numbers,
+  vectors, limits, derivatives, integrals, and infinite series.
+sequence_order: 30
+units:
+  - title: Functions, Deeper
+    topics:
+      - slug: f3-transformations
+        title: Function transformations
+        description: Shifts, stretches, and reflections of graphs.
+        est_minutes: 12
+        prereqs: [f2-quadratic-graphs, f2-graph-reading]
+      - slug: f3-composition
+        title: Function composition
+        description: Building and decomposing f(g(x)).
+        est_minutes: 10
+        prereqs: [f2-function-notation]
+      - slug: f3-inverse-functions
+        title: Inverse functions
+        description: Undoing functions; one-to-one criteria; finding inverses.
+        est_minutes: 12
+        prereqs: [f3-composition, f2-domain-range]
+      - slug: f3-piecewise
+        title: Piecewise functions
+        description: Evaluating and graphing piecewise definitions.
+        est_minutes: 8
+        prereqs: [f2-graph-reading]
+  - title: Polynomial & Rational Functions
+    topics:
+      - slug: f3-polynomial-graphs
+        title: Polynomial graphs and end behavior
+        description: Zeros, multiplicity, and shape of polynomial curves.
+        est_minutes: 12
+        prereqs: [f2-quadratic-graphs, f2-polynomial-division]
+      - slug: f3-polynomial-roots
+        title: Roots of polynomials
+        description: Rational root theorem; factoring higher-degree polynomials.
+        est_minutes: 12
+        prereqs: [f3-polynomial-graphs]
+      - slug: f3-rational-functions
+        title: Rational functions and asymptotes
+        description: Vertical, horizontal, and slant asymptotes; graphing.
+        est_minutes: 14
+        prereqs: [f3-polynomial-graphs, f2-rational-simplify]
+  - title: Trigonometry
+    topics:
+      - slug: f3-angles-radians
+        title: Angles and radian measure
+        description: Degrees vs radians; arc length; angular speed.
+        est_minutes: 10
+        prereqs: [ratios, perimeter-area]
+      - slug: f3-right-triangle-trig
+        title: Right-triangle trigonometry
+        description: Sine, cosine, tangent as ratios; solving right triangles.
+        est_minutes: 12
+        prereqs: [f3-angles-radians, square-roots]
+      - slug: f3-unit-circle
+        title: The unit circle
+        description: Trig values of special angles; reference angles; signs by quadrant.
+        est_minutes: 14
+        prereqs: [f3-right-triangle-trig, coordinate-plane]
+      - slug: f3-trig-graphs
+        title: Graphs of trig functions
+        description: Amplitude, period, and phase of sinusoids.
+        est_minutes: 12
+        prereqs: [f3-unit-circle, f3-transformations]
+      - slug: f3-trig-identities
+        title: Fundamental trig identities
+        description: Pythagorean, reciprocal, and even/odd identities.
+        est_minutes: 12
+        prereqs: [f3-unit-circle]
+      - slug: f3-sum-difference
+        title: Sum, difference, and double-angle formulas
+        description: Expanding sin(a±b), cos(a±b), and consequences.
+        est_minutes: 12
+        prereqs: [f3-trig-identities]
+      - slug: f3-trig-equations
+        title: Trigonometric equations
+        description: Solving equations over given intervals.
+        est_minutes: 12
+        prereqs: [f3-trig-identities, f2-quadratic-solve-factoring]
+      - slug: f3-law-sines-cosines
+        title: Law of sines and law of cosines
+        description: Solving oblique triangles.
+        est_minutes: 12
+        prereqs: [f3-right-triangle-trig]
+        resources:
+          - kind: reading
+            title: Khan Academy — Trigonometry
+            url: https://www.khanacademy.org/math/trigonometry
+  - title: Complex Numbers & Vectors
+    topics:
+      - slug: f3-complex-intro
+        title: Complex numbers
+        description: The imaginary unit; complex arithmetic; conjugates.
+        est_minutes: 12
+        prereqs: [f2-quadratic-formula]
+      - slug: f3-complex-polar
+        title: Polar form of complex numbers
+        description: Modulus, argument, and De Moivre's theorem.
+        est_minutes: 12
+        prereqs: [f3-complex-intro, f3-unit-circle]
+      - slug: f3-vectors
+        title: Vectors in the plane
+        description: Components, magnitude, addition, and scalar multiples.
+        est_minutes: 12
+        prereqs: [f3-right-triangle-trig, coordinate-plane]
+  - title: Limits & Continuity
+    topics:
+      - slug: f3-limits-intuition
+        title: Limits, intuitively
+        description: Approaching a value; one-sided limits; limits from graphs.
+        est_minutes: 12
+        prereqs: [f3-rational-functions]
+      - slug: f3-limit-laws
+        title: Limit laws and computation
+        description: Evaluating limits algebraically; indeterminate forms.
+        est_minutes: 12
+        prereqs: [f3-limits-intuition]
+      - slug: f3-continuity
+        title: Continuity
+        description: Continuity at a point; types of discontinuity; IVT.
+        est_minutes: 10
+        prereqs: [f3-limit-laws]
+  - title: Derivatives
+    topics:
+      - slug: f3-derivative-definition
+        title: The derivative as a limit
+        description: Difference quotients; the derivative at a point; tangent lines.
+        est_minutes: 14
+        prereqs: [f3-limit-laws, f2-slope]
+      - slug: f3-derivative-rules
+        title: Basic derivative rules
+        description: Power rule, sums, and constant multiples.
+        est_minutes: 12
+        prereqs: [f3-derivative-definition]
+      - slug: f3-product-quotient
+        title: Product and quotient rules
+        description: Differentiating products and quotients.
+        est_minutes: 12
+        prereqs: [f3-derivative-rules]
+      - slug: f3-chain-rule
+        title: The chain rule
+        description: Differentiating compositions.
+        est_minutes: 14
+        prereqs: [f3-product-quotient, f3-composition]
+      - slug: f3-trig-exp-log-derivatives
+        title: Derivatives of trig, exponential, and log functions
+        description: The standard derivative catalogue.
+        est_minutes: 12
+        prereqs: [f3-chain-rule, f3-trig-identities, f2-log-properties]
+      - slug: f3-implicit
+        title: Implicit differentiation
+        description: Differentiating relations; derivatives of inverses.
+        est_minutes: 12
+        prereqs: [f3-chain-rule]
+        resources:
+          - kind: video
+            title: 3Blue1Brown — Essence of Calculus
+            url: https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr
+  - title: Applications of Derivatives
+    topics:
+      - slug: f3-related-rates
+        title: Related rates
+        description: Linking rates of change through equations.
+        est_minutes: 14
+        prereqs: [f3-implicit]
+      - slug: f3-curve-sketching
+        title: Curve sketching and extrema
+        description: First and second derivative tests; concavity; inflection.
+        est_minutes: 14
+        prereqs: [f3-trig-exp-log-derivatives]
+      - slug: f3-optimization
+        title: Optimization
+        description: Setting up and solving max/min problems.
+        est_minutes: 14
+        prereqs: [f3-curve-sketching]
+      - slug: f3-lhopital
+        title: L'Hôpital's rule
+        description: Indeterminate limits via derivatives.
+        est_minutes: 10
+        prereqs: [f3-curve-sketching]
+  - title: Integrals
+    topics:
+      - slug: f3-antiderivatives
+        title: Antiderivatives
+        description: Reversing differentiation; general antiderivatives.
+        est_minutes: 10
+        prereqs: [f3-trig-exp-log-derivatives]
+      - slug: f3-definite-integral
+        title: The definite integral
+        description: Riemann sums and signed area.
+        est_minutes: 12
+        prereqs: [f3-antiderivatives]
+      - slug: f3-ftc
+        title: The fundamental theorem of calculus
+        description: Connecting derivatives and integrals.
+        est_minutes: 12
+        prereqs: [f3-definite-integral]
+      - slug: f3-substitution
+        title: Integration by substitution
+        description: Reversing the chain rule.
+        est_minutes: 12
+        prereqs: [f3-ftc]
+      - slug: f3-integration-by-parts
+        title: Integration by parts
+        description: Reversing the product rule.
+        est_minutes: 12
+        prereqs: [f3-substitution]
+      - slug: f3-partial-fractions
+        title: Integration by partial fractions
+        description: Decomposing rational integrands.
+        est_minutes: 12
+        prereqs: [f3-substitution, f2-rational-add-sub]
+      - slug: f3-improper-integrals
+        title: Improper integrals
+        description: Infinite limits of integration and unbounded integrands.
+        est_minutes: 10
+        prereqs: [f3-substitution, f3-lhopital]
+      - slug: f3-integral-applications
+        title: Applications of integration
+        description: Areas between curves, volumes of revolution, average value.
+        est_minutes: 14
+        prereqs: [f3-ftc]
+        resources:
+          - kind: reading
+            title: MIT OCW 18.01 — Single Variable Calculus
+            url: https://ocw.mit.edu/courses/18-01sc-single-variable-calculus-fall-2010/
+  - title: Sequences & Series
+    topics:
+      - slug: f3-sequences-limits
+        title: Sequences and their limits
+        description: Convergence of sequences.
+        est_minutes: 10
+        prereqs: [f2-geometric-sequences, f3-limit-laws]
+      - slug: f3-series-convergence
+        title: Infinite series and convergence tests
+        description: Geometric and p-series; comparison, ratio, and alternating tests.
+        est_minutes: 14
+        prereqs: [f3-sequences-limits]
+      - slug: f3-power-series
+        title: Power series
+        description: Radius and interval of convergence.
+        est_minutes: 12
+        prereqs: [f3-series-convergence]
+      - slug: f3-taylor-series
+        title: Taylor and Maclaurin series
+        description: Representing functions as power series.
+        est_minutes: 14
+        prereqs: [f3-power-series, f3-trig-exp-log-derivatives]

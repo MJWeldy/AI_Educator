@@ -1,0 +1,116 @@
+slug: methods-of-proof
+title: Methods of Proof
+description: >
+  The bridge to advanced mathematics: logic, sets, and the standard proof
+  techniques — direct proof, contrapositive, contradiction, cases, and induction.
+sequence_order: 40
+units:
+  - title: Logic
+    topics:
+      - slug: mp-statements
+        title: Statements and logical connectives
+        description: Propositions; and, or, not; truth tables.
+        est_minutes: 12
+        prereqs: [f2-function-notation]
+      - slug: mp-conditionals
+        title: Conditional statements
+        description: Implication, converse, inverse, contrapositive, biconditional.
+        est_minutes: 12
+        prereqs: [mp-statements]
+      - slug: mp-quantifiers
+        title: Quantifiers
+        description: For all, there exists; negating quantified statements.
+        est_minutes: 12
+        prereqs: [mp-conditionals]
+      - slug: mp-logical-equivalence
+        title: Logical equivalence
+        description: De Morgan's laws and equivalence via truth tables.
+        est_minutes: 10
+        prereqs: [mp-conditionals]
+        resources:
+          - kind: reading
+            title: Book of Proof (free) — Richard Hammack
+            url: https://www.people.vcu.edu/~rhammack/BookOfProof/
+  - title: Sets & Relations
+    topics:
+      - slug: mp-sets
+        title: Sets and set operations
+        description: Membership, subsets, unions, intersections, complements, power sets.
+        est_minutes: 12
+        prereqs: [mp-statements]
+      - slug: mp-cartesian-products
+        title: Cartesian products
+        description: Ordered pairs and products of sets.
+        est_minutes: 8
+        prereqs: [mp-sets]
+      - slug: mp-relations
+        title: Relations
+        description: Relations as subsets of products; reflexive, symmetric, transitive.
+        est_minutes: 12
+        prereqs: [mp-cartesian-products]
+      - slug: mp-equivalence-relations
+        title: Equivalence relations and partitions
+        description: Equivalence classes and the partition correspondence.
+        est_minutes: 12
+        prereqs: [mp-relations]
+      - slug: mp-functions-formal
+        title: Functions, formally
+        description: Injective, surjective, bijective; images and preimages.
+        est_minutes: 14
+        prereqs: [mp-cartesian-products, f3-inverse-functions]
+  - title: Proof Techniques
+    topics:
+      - slug: mp-direct-proof
+        title: Direct proof
+        description: Proving implications from definitions; parity and divisibility proofs.
+        est_minutes: 14
+        prereqs: [mp-conditionals, mp-sets, prime-factorization]
+      - slug: mp-contrapositive
+        title: Proof by contrapositive
+        description: When proving the contrapositive is easier.
+        est_minutes: 12
+        prereqs: [mp-direct-proof]
+      - slug: mp-contradiction
+        title: Proof by contradiction
+        description: Deriving absurdity; irrationality of √2; infinitude of primes.
+        est_minutes: 14
+        prereqs: [mp-contrapositive]
+      - slug: mp-cases
+        title: Proof by cases
+        description: Exhaustive case analysis; without loss of generality.
+        est_minutes: 10
+        prereqs: [mp-direct-proof]
+      - slug: mp-biconditional-proofs
+        title: If-and-only-if and set-equality proofs
+        description: Proving both directions; double inclusion.
+        est_minutes: 12
+        prereqs: [mp-cases, mp-contrapositive]
+      - slug: mp-existence-uniqueness
+        title: Existence and uniqueness proofs
+        description: Constructive and non-constructive existence; proving uniqueness.
+        est_minutes: 10
+        prereqs: [mp-quantifiers, mp-direct-proof]
+      - slug: mp-counterexamples
+        title: Disproof and counterexamples
+        description: Refuting universal claims; disproving existence.
+        est_minutes: 8
+        prereqs: [mp-quantifiers]
+  - title: Induction
+    topics:
+      - slug: mp-induction
+        title: Mathematical induction
+        description: Base case and inductive step; summation identities.
+        est_minutes: 14
+        prereqs: [mp-direct-proof, f2-arithmetic-sequences]
+      - slug: mp-strong-induction
+        title: Strong induction and well-ordering
+        description: Complete induction; existence of prime factorization.
+        est_minutes: 12
+        prereqs: [mp-induction]
+  - title: Cardinality
+    topics:
+      - slug: mp-countability
+        title: Countable and uncountable sets
+        description: Bijections with ℕ; Cantor's diagonal argument.
+        est_minutes: 14
+        prereqs: [mp-functions-formal, mp-contradiction]

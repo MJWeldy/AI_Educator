@@ -1,0 +1,128 @@
+slug: differential-equations
+title: Differential Equations
+description: >
+  Ordinary differential equations: first- and second-order methods, Laplace
+  transforms, linear systems, qualitative analysis, and a first look at
+  numerical methods.
+sequence_order: 100
+units:
+  - title: First-Order Equations
+    topics:
+      - slug: de-classification
+        title: What differential equations are
+        description: Order, linearity, solutions, and initial value problems.
+        est_minutes: 10
+        prereqs: [f3-antiderivatives]
+      - slug: de-separable
+        title: Separable equations
+        description: Separating variables and integrating.
+        est_minutes: 12
+        prereqs: [de-classification, f3-substitution]
+      - slug: de-linear-first-order
+        title: Linear first-order equations
+        description: Integrating factors.
+        est_minutes: 14
+        prereqs: [de-separable, f3-integration-by-parts]
+      - slug: de-exact
+        title: Exact equations
+        description: Recognizing and solving exact forms.
+        est_minutes: 12
+        prereqs: [de-linear-first-order, mvc-partial-derivatives]
+      - slug: de-first-order-models
+        title: First-order models
+        description: Growth, decay, cooling, and mixing problems.
+        est_minutes: 14
+        prereqs: [de-linear-first-order, f2-growth-decay]
+      - slug: de-qualitative
+        title: Slope fields and equilibria
+        description: Qualitative behavior; stability of equilibria; autonomous equations.
+        est_minutes: 12
+        prereqs: [de-separable, f3-curve-sketching]
+        resources:
+          - kind: reading
+            title: MIT OCW 18.03 — Differential Equations
+            url: https://ocw.mit.edu/courses/18-03sc-differential-equations-fall-2011/
+          - kind: reading
+            title: Paul's Online Notes — Differential Equations
+            url: https://tutorial.math.lamar.edu/Classes/DE/DE.aspx
+  - title: Second-Order Equations
+    topics:
+      - slug: de-second-order-homogeneous
+        title: Homogeneous linear equations with constant coefficients
+        description: Characteristic equations with real roots.
+        est_minutes: 14
+        prereqs: [de-linear-first-order, f2-quadratic-formula]
+      - slug: de-complex-repeated-roots
+        title: Complex and repeated roots
+        description: Oscillatory solutions via Euler's formula.
+        est_minutes: 14
+        prereqs: [de-second-order-homogeneous, f3-complex-polar]
+      - slug: de-undetermined-coefficients
+        title: Undetermined coefficients
+        description: Particular solutions for polynomial, exponential, sinusoidal forcing.
+        est_minutes: 14
+        prereqs: [de-complex-repeated-roots]
+      - slug: de-variation-parameters
+        title: Variation of parameters
+        description: Particular solutions for general forcing.
+        est_minutes: 12
+        prereqs: [de-undetermined-coefficients, la-determinants]
+      - slug: de-oscillations
+        title: Mechanical and electrical oscillations
+        description: Damping, forcing, and resonance.
+        est_minutes: 14
+        prereqs: [de-undetermined-coefficients]
+  - title: Laplace Transforms
+    topics:
+      - slug: de-laplace
+        title: The Laplace transform
+        description: Definition and transforms of standard functions.
+        est_minutes: 12
+        prereqs: [f3-improper-integrals]
+      - slug: de-inverse-laplace
+        title: Inverse transforms
+        description: Partial fractions and table lookup.
+        est_minutes: 12
+        prereqs: [de-laplace, f3-partial-fractions]
+      - slug: de-laplace-ivps
+        title: Solving IVPs with Laplace transforms
+        description: Turning ODEs into algebra.
+        est_minutes: 14
+        prereqs: [de-inverse-laplace, de-complex-repeated-roots]
+      - slug: de-step-impulse
+        title: Step functions and impulses
+        description: Discontinuous forcing and the Dirac delta.
+        est_minutes: 12
+        prereqs: [de-laplace-ivps]
+  - title: Systems & Qualitative Theory
+    topics:
+      - slug: de-systems
+        title: Systems of linear ODEs
+        description: Writing systems in matrix form.
+        est_minutes: 12
+        prereqs: [de-second-order-homogeneous, la-matrix-multiplication]
+      - slug: de-eigen-method
+        title: The eigenvalue method
+        description: Solving x' = Ax with eigenpairs.
+        est_minutes: 14
+        prereqs: [de-systems, la-eigen]
+      - slug: de-phase-plane
+        title: The phase plane
+        description: "Classifying equilibria: nodes, saddles, spirals, centers."
+        est_minutes: 14
+        prereqs: [de-eigen-method]
+      - slug: de-nonlinear
+        title: Nonlinear systems and linearization
+        description: Stability of equilibria via the Jacobian.
+        est_minutes: 14
+        prereqs: [de-phase-plane, mvc-partial-derivatives]
+      - slug: de-numerical
+        title: Numerical methods
+        description: Euler and Runge–Kutta methods; error behavior.
+        est_minutes: 12
+        prereqs: [de-classification, f3-taylor-series]
+      - slug: de-series-solutions
+        title: Series solutions
+        description: Power-series solutions near ordinary points.
+        est_minutes: 14
+        prereqs: [de-second-order-homogeneous, f3-power-series]

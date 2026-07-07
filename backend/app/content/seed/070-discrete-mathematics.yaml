@@ -1,0 +1,136 @@
+slug: discrete-mathematics
+title: Discrete Mathematics
+description: >
+  The mathematics of the discrete: counting, recurrences, graph theory, and
+  number theory, with proofs throughout.
+sequence_order: 70
+units:
+  - title: Counting
+    topics:
+      - slug: dm-counting-principles
+        title: Sum and product rules
+        description: Basic counting principles; counting by complement.
+        est_minutes: 10
+        prereqs: [mp-sets]
+      - slug: dm-permutations
+        title: Permutations
+        description: Arrangements and factorials; k-permutations.
+        est_minutes: 10
+        prereqs: [dm-counting-principles]
+      - slug: dm-combinations
+        title: Combinations
+        description: Choosing without order; binomial coefficients.
+        est_minutes: 12
+        prereqs: [dm-permutations]
+      - slug: dm-binomial-theorem
+        title: The binomial theorem
+        description: Expanding (x + y)ⁿ; Pascal's triangle identities.
+        est_minutes: 12
+        prereqs: [dm-combinations, f2-polynomial-multiply]
+      - slug: dm-inclusion-exclusion
+        title: Inclusion–exclusion
+        description: Counting unions of overlapping sets.
+        est_minutes: 12
+        prereqs: [dm-combinations]
+      - slug: dm-pigeonhole
+        title: The pigeonhole principle
+        description: Existence by counting.
+        est_minutes: 10
+        prereqs: [dm-counting-principles, mp-contradiction]
+      - slug: dm-stars-bars
+        title: Stars and bars
+        description: Counting multisets and integer solutions.
+        est_minutes: 12
+        prereqs: [dm-combinations]
+        resources:
+          - kind: reading
+            title: MIT OCW 6.042J — Mathematics for Computer Science
+            url: https://ocw.mit.edu/courses/6-042j-mathematics-for-computer-science-spring-2015/
+  - title: Recursion & Recurrences
+    topics:
+      - slug: dm-recursive-definitions
+        title: Recursive definitions
+        description: Recursively defined sequences, sets, and structures.
+        est_minutes: 10
+        prereqs: [mp-induction]
+      - slug: dm-linear-recurrences
+        title: Solving linear recurrences
+        description: Characteristic equations; Fibonacci in closed form.
+        est_minutes: 14
+        prereqs: [dm-recursive-definitions, f2-quadratic-formula]
+  - title: Number Theory
+    topics:
+      - slug: dm-divisibility
+        title: Divisibility and the division algorithm
+        description: Quotients, remainders, and divisibility proofs.
+        est_minutes: 10
+        prereqs: [mp-direct-proof]
+      - slug: dm-gcd-euclid
+        title: GCD and the Euclidean algorithm
+        description: Computing gcds; Bézout's identity.
+        est_minutes: 12
+        prereqs: [dm-divisibility, gcf]
+      - slug: dm-modular-arithmetic
+        title: Modular arithmetic
+        description: Congruences and arithmetic mod n.
+        est_minutes: 14
+        prereqs: [dm-divisibility]
+      - slug: dm-modular-inverses
+        title: Modular inverses and linear congruences
+        description: Solving ax ≡ b (mod n); Chinese remainder idea.
+        est_minutes: 12
+        prereqs: [dm-modular-arithmetic, dm-gcd-euclid]
+      - slug: dm-fermat-euler
+        title: Fermat's little theorem and Euler's theorem
+        description: Powers mod primes; the totient function.
+        est_minutes: 12
+        prereqs: [dm-modular-inverses]
+      - slug: dm-rsa
+        title: RSA cryptography
+        description: Public-key encryption from number theory.
+        est_minutes: 14
+        prereqs: [dm-fermat-euler]
+  - title: Graph Theory
+    topics:
+      - slug: dm-graphs-intro
+        title: Graphs and their representations
+        description: Vertices, edges, degree; adjacency structures; handshake lemma.
+        est_minutes: 12
+        prereqs: [mp-sets, dm-counting-principles]
+      - slug: dm-paths-connectivity
+        title: Paths, cycles, and connectivity
+        description: Walks and connected components.
+        est_minutes: 10
+        prereqs: [dm-graphs-intro]
+      - slug: dm-trees
+        title: Trees
+        description: Characterizations of trees; rooted trees; counting edges.
+        est_minutes: 12
+        prereqs: [dm-paths-connectivity, mp-induction]
+      - slug: dm-euler-hamilton
+        title: Eulerian and Hamiltonian graphs
+        description: Traversing every edge or every vertex.
+        est_minutes: 12
+        prereqs: [dm-paths-connectivity]
+      - slug: dm-graph-coloring
+        title: Graph coloring
+        description: Chromatic numbers; bipartite graphs.
+        est_minutes: 12
+        prereqs: [dm-paths-connectivity]
+      - slug: dm-planar
+        title: Planar graphs
+        description: Euler's formula V − E + F = 2 and its consequences.
+        est_minutes: 12
+        prereqs: [dm-trees, dm-graph-coloring]
+  - title: Structures
+    topics:
+      - slug: dm-posets
+        title: Partial orders
+        description: Posets, Hasse diagrams, chains and antichains.
+        est_minutes: 12
+        prereqs: [mp-equivalence-relations]
+      - slug: dm-boolean-algebra
+        title: Boolean algebra
+        description: Boolean functions, normal forms, and logic circuits.
+        est_minutes: 12
+        prereqs: [mp-logical-equivalence]

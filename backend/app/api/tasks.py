@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..content import checking
-from ..content.generators import REGISTRY, make_instance
+from ..content.serving import resolve_submission
 from ..db import get_db
 from ..engine import scheduler, srs, xp
 from ..engine.mastery import get_or_create_state
@@ -96,8 +96,9 @@ class TaskProblemOut(BaseModel):
     index: int
     topic_id: int
     topic_title: str
-    generator_key: str
-    seed: int
+    problem_id: int | None = None
+    generator_key: str | None = None
+    seed: int | None = None
     difficulty: int
     statement_md: str
     parts: list[dict]
@@ -122,18 +123,28 @@ def task_detail(task_id: int, db: Session = Depends(get_db)):
     out = []
     for i, p in enumerate(problems):
         topic = db.get(Topic, p["topic_id"])
-        inst = make_instance(p["generator_key"], p["seed"], p["difficulty"])
-        pub = inst.public_dict()
+        parts, presented, _solution = resolve_submission(
+            db,
+            problem_id=p.get("problem_id"),
+            generator_key=p.get("generator_key"),
+            seed=p.get("seed"),
+            difficulty=p.get("difficulty", 2),
+        )
+        public_parts = [
+            {"prompt_md": pt.get("prompt_md", ""), "answer_type": pt.get("answer_type"), "choices": pt.get("choices")}
+            for pt in parts
+        ]
         out.append(
             TaskProblemOut(
                 index=i,
                 topic_id=p["topic_id"],
                 topic_title=topic.title if topic else "",
-                generator_key=p["generator_key"],
-                seed=p["seed"],
-                difficulty=p["difficulty"],
-                statement_md=pub["statement_md"],
-                parts=pub["parts"],
+                problem_id=p.get("problem_id"),
+                generator_key=p.get("generator_key"),
+                seed=p.get("seed"),
+                difficulty=p.get("difficulty", 2),
+                statement_md=presented["statement_md"],
+                parts=public_parts,
                 done=bool(p.get("done")),
                 correct=p.get("correct"),
             )
@@ -173,20 +184,16 @@ def task_attempt(task_id: int, body: TaskAttemptIn, db: Session = Depends(get_db
     p = dict(problems[body.index])
     if p.get("done"):
         raise HTTPException(409, "problem already answered")
-    if p["generator_key"] not in REGISTRY:
-        raise HTTPException(400, "unknown generator")
-
-    inst = make_instance(p["generator_key"], p["seed"], p["difficulty"])
-    parts = [
-        {
-            "prompt_md": pt.prompt_md,
-            "answer_type": pt.answer_type,
-            "canonical": pt.canonical,
-            "tolerance": pt.tolerance,
-            "choices": pt.choices,
-        }
-        for pt in inst.parts
-    ]
+    try:
+        parts, presented, solution_md = resolve_submission(
+            db,
+            problem_id=p.get("problem_id"),
+            generator_key=p.get("generator_key"),
+            seed=p.get("seed"),
+            difficulty=p.get("difficulty", 2),
+        )
+    except KeyError as e:
+        raise HTTPException(400, str(e))
     correct, part_results = checking.check_instance(parts, body.answers)
 
     p["done"] = True
@@ -200,10 +207,11 @@ def task_attempt(task_id: int, body: TaskAttemptIn, db: Session = Depends(get_db
             profile_id=PROFILE_ID,
             topic_id=p["topic_id"],
             task_id=task.id,
-            generator_key=p["generator_key"],
-            seed=p["seed"],
-            difficulty=p["difficulty"],
-            presented=inst.to_dict(),
+            problem_id=p.get("problem_id"),
+            generator_key=p.get("generator_key"),
+            seed=p.get("seed"),
+            difficulty=p.get("difficulty", 2),
+            presented=presented,
             user_answer={"answers": body.answers},
             correct=correct,
             part_results=part_results,
@@ -237,8 +245,8 @@ def task_attempt(task_id: int, body: TaskAttemptIn, db: Session = Depends(get_db
     return TaskAttemptOut(
         correct=correct,
         part_results=part_results,
-        solution_md=inst.solution_md,
-        canonical=[pt["canonical"] for pt in parts],
+        solution_md=solution_md,
+        canonical=[str(pt["canonical"]) for pt in parts],
         task_status=task.status,
         task_complete=task_complete,
         xp_awarded=xp_awarded,

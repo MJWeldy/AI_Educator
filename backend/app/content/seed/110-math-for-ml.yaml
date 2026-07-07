@@ -1,0 +1,95 @@
+slug: math-for-ml
+title: Mathematics for Machine Learning
+description: >
+  The mathematics that machine learning actually uses: matrix calculus and
+  decompositions, optimization, probability for models, and the derivations
+  behind regression, classification, and backpropagation.
+sequence_order: 110
+units:
+  - title: Linear Algebra for ML
+    topics:
+      - slug: ml-norms
+        title: Norms and distances
+        description: L1, L2, and infinity norms; distance and similarity.
+        est_minutes: 12
+        prereqs: [la-dot-product]
+      - slug: ml-matrix-decompositions
+        title: Decompositions in practice
+        description: Eigendecomposition, SVD, and what they buy you.
+        est_minutes: 14
+        prereqs: [la-svd]
+      - slug: ml-pca
+        title: Principal component analysis
+        description: Variance maximization; PCA via eigenvectors and SVD.
+        est_minutes: 16
+        prereqs: [ml-matrix-decompositions, ps-covariance]
+        resources:
+          - kind: reading
+            title: Mathematics for Machine Learning (free book)
+            url: https://mml-book.github.io/
+  - title: Matrix Calculus & Optimization
+    topics:
+      - slug: ml-gradients-jacobians
+        title: Gradients, Jacobians, and Hessians
+        description: Derivatives of vector- and matrix-valued expressions.
+        est_minutes: 14
+        prereqs: [mvc-gradient, la-matrix-multiplication]
+      - slug: ml-matrix-calculus
+        title: Matrix calculus rules
+        description: Differentiating quadratic forms and linear maps.
+        est_minutes: 14
+        prereqs: [ml-gradients-jacobians]
+      - slug: ml-convexity
+        title: Convexity
+        description: Convex sets and functions; why convexity makes optimization easy.
+        est_minutes: 14
+        prereqs: [ml-gradients-jacobians, f3-curve-sketching]
+      - slug: ml-gradient-descent
+        title: Gradient descent
+        description: Step sizes, convergence intuition, and variants (momentum, SGD).
+        est_minutes: 14
+        prereqs: [ml-convexity]
+      - slug: ml-constrained
+        title: Constrained optimization and KKT
+        description: Lagrangians, duality, and KKT conditions.
+        est_minutes: 16
+        prereqs: [ml-convexity, mvc-lagrange]
+  - title: Probability for ML
+    topics:
+      - slug: ml-multivariate-gaussian
+        title: The multivariate Gaussian
+        description: Mean vectors, covariance matrices, and Gaussian geometry.
+        est_minutes: 14
+        prereqs: [ps-normal, ps-covariance, la-symmetric-spectral]
+      - slug: ml-mle-map
+        title: MLE and MAP estimation
+        description: Likelihoods, log-likelihoods, and priors as regularizers.
+        est_minutes: 14
+        prereqs: [ps-point-estimation, ps-bayesian]
+      - slug: ml-information-theory
+        title: Entropy and KL divergence
+        description: Information, cross-entropy, and why it's the classification loss.
+        est_minutes: 14
+        prereqs: [ps-expectation, f2-log-properties]
+  - title: Models, Derived
+    topics:
+      - slug: ml-linear-regression
+        title: Linear regression, derived
+        description: Least squares via calculus and via projections; ridge regularization.
+        est_minutes: 16
+        prereqs: [ml-matrix-calculus, la-least-squares, ml-mle-map]
+      - slug: ml-logistic-regression
+        title: Logistic regression, derived
+        description: Sigmoids, cross-entropy loss, and its gradient.
+        est_minutes: 16
+        prereqs: [ml-linear-regression, ml-information-theory]
+      - slug: ml-backprop
+        title: Backpropagation
+        description: The chain rule organized over a computation graph.
+        est_minutes: 16
+        prereqs: [ml-logistic-regression, ml-gradients-jacobians]
+      - slug: ml-kernels
+        title: Kernels and the kernel trick
+        description: Feature maps, kernel functions, and kernelized models.
+        est_minutes: 14
+        prereqs: [ml-constrained, la-orthogonal-sets]

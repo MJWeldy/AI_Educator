@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from ..content import checking
-from ..content.generators import REGISTRY, make_instance
+from ..content.serving import pick_problem, resolve_submission
 from ..db import get_db
 from ..engine import diagnostic as diag
 from ..engine.graph import TopicGraph
@@ -19,8 +19,9 @@ PROFILE_ID = 1
 class ProbeOut(BaseModel):
     topic_id: int
     topic_title: str
-    generator_key: str
-    seed: int
+    problem_id: int | None = None
+    generator_key: str | None = None
+    seed: int | None = None
     difficulty: int
     statement_md: str
     parts: list[dict]
@@ -36,22 +37,18 @@ class SessionOut(BaseModel):
 
 def _make_probe(db: Session, topic_id: int) -> ProbeOut | None:
     topic = db.get(Topic, topic_id)
-    keys = [k for k in (topic.generator_keys or []) if k in REGISTRY]
-    if not keys:
+    served = pick_problem(db, topic, 2, verified_only=True)
+    if served is None:
         return None
-    rng = random.Random()
-    key = rng.choice(keys)
-    seed = rng.randrange(1, 2**31)
-    inst = make_instance(key, seed, 2)
-    pub = inst.public_dict()
     return ProbeOut(
         topic_id=topic.id,
         topic_title=topic.title,
-        generator_key=key,
-        seed=seed,
-        difficulty=2,
-        statement_md=pub["statement_md"],
-        parts=pub["parts"],
+        problem_id=served.problem_id,
+        generator_key=served.generator_key,
+        seed=served.seed,
+        difficulty=served.difficulty,
+        statement_md=served.statement_md,
+        parts=served.parts_public,
     )
 
 
@@ -85,9 +82,10 @@ def start(body: StartIn, db: Session = Depends(get_db)):
 
 class AnswerIn(BaseModel):
     topic_id: int
-    generator_key: str
-    seed: int
-    difficulty: int
+    problem_id: int | None = None
+    generator_key: str | None = None
+    seed: int | None = None
+    difficulty: int = 2
     answers: list[str]
 
 
@@ -104,26 +102,26 @@ def answer(session_id: int, body: AnswerIn, db: Session = Depends(get_db)):
         raise HTTPException(404, "no active session")
     graph = TopicGraph.load(db)
 
-    inst = make_instance(body.generator_key, body.seed, body.difficulty)
-    parts = [
-        {
-            "prompt_md": p.prompt_md,
-            "answer_type": p.answer_type,
-            "canonical": p.canonical,
-            "tolerance": p.tolerance,
-            "choices": p.choices,
-        }
-        for p in inst.parts
-    ]
+    try:
+        parts, presented, _solution = resolve_submission(
+            db,
+            problem_id=body.problem_id,
+            generator_key=body.generator_key,
+            seed=body.seed,
+            difficulty=body.difficulty,
+        )
+    except KeyError as e:
+        raise HTTPException(400, str(e))
     correct, part_results = checking.check_instance(parts, body.answers)
     db.add(
         Attempt(
             profile_id=PROFILE_ID,
             topic_id=body.topic_id,
+            problem_id=body.problem_id,
             generator_key=body.generator_key,
             seed=body.seed,
             difficulty=body.difficulty,
-            presented=inst.to_dict(),
+            presented=presented,
             user_answer={"answers": body.answers},
             correct=correct,
             part_results=part_results,

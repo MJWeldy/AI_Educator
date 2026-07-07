@@ -1,0 +1,155 @@
+slug: probability-statistics
+title: Probability & Statistics
+description: >
+  Probability from axioms through distributions and limit theorems, then
+  statistical inference: estimation, confidence intervals, hypothesis testing,
+  and regression.
+sequence_order: 90
+units:
+  - title: Probability Foundations
+    topics:
+      - slug: ps-sample-spaces
+        title: Sample spaces and events
+        description: Outcomes, events, and set operations on events.
+        est_minutes: 10
+        prereqs: [mp-sets, dm-counting-principles]
+      - slug: ps-probability-axioms
+        title: Probability axioms
+        description: Probability measures; complement and union rules.
+        est_minutes: 12
+        prereqs: [ps-sample-spaces]
+      - slug: ps-counting-probability
+        title: Probability by counting
+        description: Equally likely outcomes; combinatorial probability.
+        est_minutes: 12
+        prereqs: [ps-probability-axioms, dm-combinations]
+      - slug: ps-conditional
+        title: Conditional probability
+        description: Conditioning; multiplication rule; law of total probability.
+        est_minutes: 14
+        prereqs: [ps-probability-axioms]
+      - slug: ps-bayes
+        title: Bayes' theorem
+        description: Inverting conditional probabilities; base rates.
+        est_minutes: 14
+        prereqs: [ps-conditional]
+      - slug: ps-independence
+        title: Independence
+        description: Independent events; pairwise vs mutual.
+        est_minutes: 10
+        prereqs: [ps-conditional]
+        resources:
+          - kind: video
+            title: StatQuest with Josh Starmer
+            url: https://www.youtube.com/@statquest
+  - title: Random Variables
+    topics:
+      - slug: ps-random-variables
+        title: Random variables
+        description: Discrete random variables and probability mass functions.
+        est_minutes: 12
+        prereqs: [ps-probability-axioms, f2-function-notation]
+      - slug: ps-expectation
+        title: Expectation
+        description: Expected value; linearity of expectation.
+        est_minutes: 14
+        prereqs: [ps-random-variables]
+      - slug: ps-variance
+        title: Variance and standard deviation
+        description: Spread; properties of variance.
+        est_minutes: 12
+        prereqs: [ps-expectation]
+      - slug: ps-bernoulli-binomial
+        title: Bernoulli and binomial distributions
+        description: Counting successes in independent trials.
+        est_minutes: 12
+        prereqs: [ps-variance, ps-independence, dm-binomial-theorem]
+      - slug: ps-geometric-poisson
+        title: Geometric and Poisson distributions
+        description: Waiting times and rare-event counts.
+        est_minutes: 12
+        prereqs: [ps-bernoulli-binomial, f3-taylor-series]
+      - slug: ps-continuous-rvs
+        title: Continuous random variables
+        description: Densities and CDFs; probabilities as integrals.
+        est_minutes: 14
+        prereqs: [ps-variance, f3-ftc]
+      - slug: ps-uniform-exponential
+        title: Uniform and exponential distributions
+        description: The simplest continuous models; memorylessness.
+        est_minutes: 12
+        prereqs: [ps-continuous-rvs]
+      - slug: ps-normal
+        title: The normal distribution
+        description: The bell curve; standardization and z-scores.
+        est_minutes: 14
+        prereqs: [ps-continuous-rvs]
+      - slug: ps-joint-distributions
+        title: Joint distributions
+        description: Joint, marginal, and conditional distributions.
+        est_minutes: 14
+        prereqs: [ps-continuous-rvs, mvc-double-integrals]
+      - slug: ps-covariance
+        title: Covariance and correlation
+        description: Measuring linear association; variance of sums.
+        est_minutes: 12
+        prereqs: [ps-joint-distributions]
+  - title: Limit Theorems
+    topics:
+      - slug: ps-lln
+        title: The law of large numbers
+        description: Sample means converge to expectations.
+        est_minutes: 10
+        prereqs: [ps-covariance]
+      - slug: ps-clt
+        title: The central limit theorem
+        description: Why sums look normal; normal approximation.
+        est_minutes: 14
+        prereqs: [ps-lln, ps-normal]
+  - title: Statistical Inference
+    topics:
+      - slug: ps-sampling
+        title: Sampling distributions
+        description: Statistics as random variables; standard errors.
+        est_minutes: 12
+        prereqs: [ps-clt]
+      - slug: ps-point-estimation
+        title: Point estimation and maximum likelihood
+        description: Estimators, bias, and MLE.
+        est_minutes: 14
+        prereqs: [ps-sampling, f3-optimization]
+      - slug: ps-confidence-intervals
+        title: Confidence intervals
+        description: Interval estimates for means and proportions.
+        est_minutes: 14
+        prereqs: [ps-sampling]
+      - slug: ps-hypothesis-testing
+        title: Hypothesis testing
+        description: Null and alternative hypotheses; test statistics; errors.
+        est_minutes: 14
+        prereqs: [ps-confidence-intervals]
+      - slug: ps-p-values
+        title: p-values and significance
+        description: Interpreting (and not misinterpreting) p-values.
+        est_minutes: 12
+        prereqs: [ps-hypothesis-testing]
+      - slug: ps-t-tests
+        title: t-distributions and t-tests
+        description: Small-sample inference; one- and two-sample tests.
+        est_minutes: 12
+        prereqs: [ps-p-values]
+      - slug: ps-chi-square
+        title: Chi-square tests
+        description: Goodness of fit and independence.
+        est_minutes: 12
+        prereqs: [ps-p-values]
+      - slug: ps-regression
+        title: Simple linear regression
+        description: Least-squares fitting and inference on slopes.
+        est_minutes: 14
+        prereqs: [ps-t-tests, la-least-squares]
+      - slug: ps-bayesian
+        title: Bayesian inference
+        description: Priors, posteriors, and conjugacy in simple models.
+        est_minutes: 14
+        prereqs: [ps-bayes, ps-point-estimation]

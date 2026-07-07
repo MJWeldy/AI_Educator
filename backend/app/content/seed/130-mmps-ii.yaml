@@ -1,0 +1,96 @@
+slug: mmps-ii
+title: Mathematical Methods for the Physical Sciences II
+description: >
+  Advanced methods: partial differential equations and boundary value problems,
+  special functions, Green's functions, calculus of variations, and complex
+  analysis with contour integration.
+sequence_order: 130
+units:
+  - title: Partial Differential Equations
+    topics:
+      - slug: mmps2-pde-classification
+        title: The big three PDEs
+        description: Heat, wave, and Laplace equations; where they come from.
+        est_minutes: 12
+        prereqs: [mmps1-odes-physics, mvc-partial-derivatives]
+      - slug: mmps2-separation-variables
+        title: Separation of variables
+        description: Reducing PDEs to ODE eigenproblems.
+        est_minutes: 16
+        prereqs: [mmps2-pde-classification, mmps1-fourier-series]
+      - slug: mmps2-heat-equation
+        title: The heat equation
+        description: Diffusion on rods; boundary and initial conditions.
+        est_minutes: 14
+        prereqs: [mmps2-separation-variables]
+      - slug: mmps2-wave-equation
+        title: The wave equation
+        description: Vibrating strings and membranes; d'Alembert's solution.
+        est_minutes: 14
+        prereqs: [mmps2-separation-variables]
+      - slug: mmps2-laplace-equation
+        title: Laplace's equation
+        description: Steady states and potentials; harmonic functions.
+        est_minutes: 14
+        prereqs: [mmps2-separation-variables]
+      - slug: mmps2-sturm-liouville
+        title: Sturm–Liouville theory
+        description: Eigenfunction expansions and orthogonality in general.
+        est_minutes: 16
+        prereqs: [mmps2-heat-equation, la-orthogonal-sets]
+  - title: Special Functions
+    topics:
+      - slug: mmps2-legendre
+        title: Legendre polynomials
+        description: Series solutions on the sphere; orthogonality.
+        est_minutes: 14
+        prereqs: [de-series-solutions, mmps2-sturm-liouville]
+      - slug: mmps2-bessel
+        title: Bessel functions
+        description: Radial problems in cylinders.
+        est_minutes: 14
+        prereqs: [mmps2-legendre]
+      - slug: mmps2-spherical-harmonics
+        title: Spherical harmonics
+        description: Angular solutions of Laplace's equation.
+        est_minutes: 14
+        prereqs: [mmps2-legendre, mmps2-laplace-equation]
+  - title: Green's Functions & Variations
+    topics:
+      - slug: mmps2-greens-functions
+        title: Green's functions
+        description: Point-source solutions and superposition.
+        est_minutes: 16
+        prereqs: [mmps1-dirac-delta, mmps2-sturm-liouville]
+      - slug: mmps2-calculus-of-variations
+        title: Calculus of variations
+        description: Functionals and the Euler–Lagrange equation.
+        est_minutes: 16
+        prereqs: [f3-optimization, mmps1-odes-physics]
+      - slug: mmps2-lagrangian-mechanics
+        title: Variational principles in physics
+        description: Least action; Lagrangian formulation of mechanics.
+        est_minutes: 14
+        prereqs: [mmps2-calculus-of-variations]
+  - title: Complex Analysis
+    topics:
+      - slug: mmps2-analytic-functions
+        title: Analytic functions
+        description: Cauchy–Riemann equations; complex differentiability.
+        est_minutes: 14
+        prereqs: [mmps1-complex-methods, mvc-partial-derivatives]
+      - slug: mmps2-contour-integration
+        title: Contour integration and Cauchy's theorem
+        description: Integrals along paths; independence and Cauchy's integral formula.
+        est_minutes: 16
+        prereqs: [mmps2-analytic-functions, mvc-line-integrals]
+      - slug: mmps2-residues
+        title: The residue theorem
+        description: Poles, residues, and evaluating real integrals.
+        est_minutes: 16
+        prereqs: [mmps2-contour-integration, f3-taylor-series]
+      - slug: mmps2-tensors
+        title: Tensors, a first look
+        description: Index notation, transformation rules, and simple examples.
+        est_minutes: 14
+        prereqs: [la-change-of-basis, mmps1-vector-calc-physics]

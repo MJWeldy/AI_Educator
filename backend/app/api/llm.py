@@ -57,6 +57,56 @@ async def generate_lesson(topic_id: int, db: Session = Depends(get_db)):
     )
 
 
+@router.post("/topics/{topic_id}/problems")
+async def generate_problems(topic_id: int, db: Session = Depends(get_db)):
+    """Generate a verified practice set for a topic with no generator."""
+    from ..ingest.generate import PROBLEMS_SCHEMA, PROBLEMS_SYSTEM, verify_problem
+    from ..llm import router as llm_router
+    from ..llm.base import JobType, Message
+    from ..llm.cache import cached_complete_json
+    from ..models import Problem
+
+    topic = db.get(Topic, topic_id)
+    if topic is None:
+        raise HTTPException(404, "topic not found")
+    try:
+        choice = llm_router.resolve(db, JobType.extra_problems)
+        result = await cached_complete_json(
+            db,
+            choice,
+            JobType.extra_problems,
+            [
+                Message("system", PROBLEMS_SYSTEM),
+                Message(
+                    "user",
+                    f"Course: {topic.course.title}\nTopic: {topic.title}\nScope: {topic.description}",
+                ),
+            ],
+            PROBLEMS_SCHEMA,
+        )
+    except LLMError as e:
+        raise HTTPException(502, str(e))
+    created = 0
+    for pdoc in result.get("problems", []):
+        parts = pdoc.get("parts", [])
+        db.add(
+            Problem(
+                topic_id=topic.id,
+                statement_md=pdoc["statement_md"],
+                parts=parts,
+                solution_md=pdoc.get("solution_md", ""),
+                difficulty=max(1, min(3, int(pdoc.get("difficulty", 1)))),
+                answer_verified=verify_problem(parts),
+                source="llm",
+                model=f"{choice.provider_name}:{choice.model}",
+                review_status="approved",
+            )
+        )
+        created += 1
+    db.commit()
+    return {"created": created}
+
+
 class HintIn(BaseModel):
     statement_md: str
     parts: list[dict]

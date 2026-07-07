@@ -1,0 +1,170 @@
+slug: linear-algebra
+title: Linear Algebra
+description: >
+  Vectors, matrices, and linear maps: systems of equations, vector spaces,
+  determinants, eigenvalues, orthogonality, and the decompositions that power
+  applied mathematics.
+sequence_order: 50
+units:
+  - title: Vectors
+    topics:
+      - slug: la-vectors
+        title: Vectors in Rⁿ
+        description: Components, addition, scalar multiplication, geometric meaning.
+        est_minutes: 12
+        prereqs: [f3-vectors]
+      - slug: la-linear-combinations
+        title: Linear combinations and span
+        description: Building vectors from others; the span of a set.
+        est_minutes: 12
+        prereqs: [la-vectors]
+      - slug: la-dot-product
+        title: Dot product, length, and angle
+        description: Inner products, norms, orthogonality, projections onto a vector.
+        est_minutes: 12
+        prereqs: [la-vectors, f3-law-sines-cosines]
+      - slug: la-cross-product
+        title: The cross product
+        description: Normal vectors, areas, and orientation in R³.
+        est_minutes: 10
+        prereqs: [la-dot-product]
+        resources:
+          - kind: video
+            title: 3Blue1Brown — Essence of Linear Algebra
+            url: https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab
+  - title: Systems & Matrices
+    topics:
+      - slug: la-linear-systems
+        title: Systems of linear equations
+        description: Geometric interpretation; consistency; free variables.
+        est_minutes: 12
+        prereqs: [f2-systems-elimination, la-linear-combinations]
+      - slug: la-gaussian-elimination
+        title: Gaussian elimination
+        description: Row operations, echelon forms, and RREF.
+        est_minutes: 14
+        prereqs: [la-linear-systems]
+      - slug: la-matrix-operations
+        title: Matrix operations
+        description: Addition, scalar multiples, transpose.
+        est_minutes: 10
+        prereqs: [la-linear-systems]
+      - slug: la-matrix-multiplication
+        title: Matrix multiplication
+        description: Row-column products; composition interpretation; properties.
+        est_minutes: 14
+        prereqs: [la-matrix-operations, la-dot-product]
+      - slug: la-inverse-matrices
+        title: Inverse matrices
+        description: Invertibility, computing inverses, the invertible matrix theorem.
+        est_minutes: 14
+        prereqs: [la-matrix-multiplication, la-gaussian-elimination]
+      - slug: la-lu
+        title: LU factorization
+        description: Elimination as factorization; solving with triangular systems.
+        est_minutes: 12
+        prereqs: [la-inverse-matrices]
+        resources:
+          - kind: video
+            title: MIT 18.06 — Gilbert Strang's Linear Algebra
+            url: https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/
+  - title: Determinants
+    topics:
+      - slug: la-determinants
+        title: Determinants
+        description: 2×2 and 3×3 determinants; cofactor expansion.
+        est_minutes: 12
+        prereqs: [la-matrix-multiplication]
+      - slug: la-determinant-properties
+        title: Properties of determinants
+        description: Effect of row operations; det(AB); volume interpretation.
+        est_minutes: 12
+        prereqs: [la-determinants, la-gaussian-elimination]
+  - title: Vector Spaces
+    topics:
+      - slug: la-vector-spaces
+        title: Vector spaces and subspaces
+        description: Axioms; subspace test; spans as subspaces.
+        est_minutes: 14
+        prereqs: [la-linear-combinations, mp-direct-proof]
+      - slug: la-independence
+        title: Linear independence
+        description: Detecting dependence; connection to solutions of Ax = 0.
+        est_minutes: 14
+        prereqs: [la-vector-spaces, la-gaussian-elimination]
+      - slug: la-basis-dimension
+        title: Basis and dimension
+        description: Coordinate systems for subspaces; dimension theorems.
+        est_minutes: 14
+        prereqs: [la-independence]
+      - slug: la-fundamental-subspaces
+        title: The four fundamental subspaces
+        description: Column space, null space, row space, left null space; rank.
+        est_minutes: 14
+        prereqs: [la-basis-dimension]
+      - slug: la-rank-nullity
+        title: Rank-nullity theorem
+        description: Dimensions of image and kernel.
+        est_minutes: 10
+        prereqs: [la-fundamental-subspaces]
+  - title: Linear Transformations
+    topics:
+      - slug: la-linear-maps
+        title: Linear transformations
+        description: Linearity; matrices as maps; geometric transformations.
+        est_minutes: 12
+        prereqs: [la-matrix-multiplication, la-vector-spaces]
+      - slug: la-kernel-image
+        title: Kernel and image
+        description: Injectivity and surjectivity of linear maps.
+        est_minutes: 12
+        prereqs: [la-linear-maps, la-fundamental-subspaces, mp-functions-formal]
+      - slug: la-change-of-basis
+        title: Change of basis
+        description: Coordinate vectors and similarity.
+        est_minutes: 14
+        prereqs: [la-linear-maps, la-basis-dimension]
+  - title: Eigenvalues
+    topics:
+      - slug: la-eigen
+        title: Eigenvalues and eigenvectors
+        description: The characteristic equation; eigenspaces.
+        est_minutes: 14
+        prereqs: [la-determinant-properties, la-independence]
+      - slug: la-diagonalization
+        title: Diagonalization
+        description: When A = PDP⁻¹; powers of matrices.
+        est_minutes: 14
+        prereqs: [la-eigen, la-change-of-basis]
+      - slug: la-complex-eigen
+        title: Complex eigenvalues
+        description: Rotation-scaling interpretation.
+        est_minutes: 10
+        prereqs: [la-eigen, f3-complex-polar]
+  - title: Orthogonality
+    topics:
+      - slug: la-orthogonal-sets
+        title: Orthogonal sets and projections
+        description: Orthonormal bases; projection onto subspaces.
+        est_minutes: 14
+        prereqs: [la-dot-product, la-basis-dimension]
+      - slug: la-gram-schmidt
+        title: Gram–Schmidt and QR
+        description: Orthogonalizing a basis; QR factorization.
+        est_minutes: 12
+        prereqs: [la-orthogonal-sets]
+      - slug: la-least-squares
+        title: Least squares
+        description: Best-fit solutions via normal equations.
+        est_minutes: 14
+        prereqs: [la-orthogonal-sets, la-fundamental-subspaces]
+      - slug: la-symmetric-spectral
+        title: Symmetric matrices and the spectral theorem
+        description: Orthogonal diagonalization; quadratic forms.
+        est_minutes: 14
+        prereqs: [la-diagonalization, la-orthogonal-sets]
+      - slug: la-svd
+        title: Singular value decomposition
+        description: The SVD and what it reveals; low-rank approximation.
+        est_minutes: 16
+        prereqs: [la-symmetric-spectral]

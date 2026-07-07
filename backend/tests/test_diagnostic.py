@@ -27,8 +27,11 @@ def test_student_knows_nothing(seeded_db):
 
 def test_student_knows_everything(seeded_db):
     result = run_diagnostic(seeded_db, lambda t: True)
-    topics = seeded_db.scalars(select(Topic)).all()
-    # Almost the whole graph should be placed as mastered.
+    from app.models import Course
+
+    course = seeded_db.scalar(select(Course).where(Course.slug == "foundations-i"))
+    topics = seeded_db.scalars(select(Topic).where(Topic.course_id == course.id)).all()
+    # Almost the whole in-scope course should be placed as mastered.
     assert result["placed_mastered"] >= len(topics) * 0.8
 
 

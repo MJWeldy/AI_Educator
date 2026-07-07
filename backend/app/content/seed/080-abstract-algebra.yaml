@@ -1,0 +1,113 @@
+slug: abstract-algebra
+title: Abstract Algebra
+description: >
+  Algebraic structures from the ground up: groups, subgroups, quotients, and
+  homomorphisms, then rings and fields.
+sequence_order: 80
+units:
+  - title: Groups
+    topics:
+      - slug: aa-binary-operations
+        title: Binary operations
+        description: Closure, associativity, identities, and inverses.
+        est_minutes: 10
+        prereqs: [mp-functions-formal]
+      - slug: aa-groups
+        title: Groups
+        description: The group axioms; first examples and non-examples.
+        est_minutes: 14
+        prereqs: [aa-binary-operations, mp-direct-proof]
+      - slug: aa-group-examples
+        title: Standard examples of groups
+        description: Integers mod n, matrix groups, symmetries.
+        est_minutes: 12
+        prereqs: [aa-groups, dm-modular-arithmetic, la-inverse-matrices]
+      - slug: aa-dihedral
+        title: Dihedral groups
+        description: Symmetries of regular polygons.
+        est_minutes: 12
+        prereqs: [aa-group-examples]
+      - slug: aa-permutation-groups
+        title: Permutation groups
+        description: Cycle notation; transpositions; even and odd permutations.
+        est_minutes: 14
+        prereqs: [aa-group-examples, dm-permutations]
+      - slug: aa-subgroups
+        title: Subgroups
+        description: Subgroup tests; centers and centralizers.
+        est_minutes: 12
+        prereqs: [aa-groups]
+      - slug: aa-cyclic-groups
+        title: Cyclic groups
+        description: Generated subgroups; orders of elements; classification.
+        est_minutes: 14
+        prereqs: [aa-subgroups, dm-gcd-euclid]
+  - title: Group Structure
+    topics:
+      - slug: aa-cosets-lagrange
+        title: Cosets and Lagrange's theorem
+        description: Partitioning by a subgroup; index; order divides.
+        est_minutes: 14
+        prereqs: [aa-cyclic-groups, mp-equivalence-relations]
+      - slug: aa-normal-subgroups
+        title: Normal subgroups
+        description: Conjugation and normality.
+        est_minutes: 12
+        prereqs: [aa-cosets-lagrange]
+      - slug: aa-quotient-groups
+        title: Quotient groups
+        description: Group structure on cosets.
+        est_minutes: 14
+        prereqs: [aa-normal-subgroups]
+      - slug: aa-homomorphisms
+        title: Group homomorphisms
+        description: Structure-preserving maps; kernels and images.
+        est_minutes: 14
+        prereqs: [aa-normal-subgroups, mp-functions-formal]
+      - slug: aa-isomorphism-theorems
+        title: The isomorphism theorems
+        description: The first isomorphism theorem and friends.
+        est_minutes: 14
+        prereqs: [aa-homomorphisms, aa-quotient-groups]
+      - slug: aa-direct-products
+        title: Direct products
+        description: Building groups from pieces; classification of finite abelian groups.
+        est_minutes: 12
+        prereqs: [aa-isomorphism-theorems]
+      - slug: aa-group-actions
+        title: Group actions
+        description: Orbits, stabilizers, and the orbit-stabilizer theorem.
+        est_minutes: 14
+        prereqs: [aa-cosets-lagrange, aa-permutation-groups]
+  - title: Rings & Fields
+    topics:
+      - slug: aa-rings
+        title: Rings
+        description: Ring axioms; units and zero divisors.
+        est_minutes: 14
+        prereqs: [aa-groups]
+      - slug: aa-integral-domains
+        title: Integral domains and fields
+        description: Cancellation; finite integral domains; characteristic.
+        est_minutes: 12
+        prereqs: [aa-rings]
+      - slug: aa-polynomial-rings
+        title: Polynomial rings
+        description: Division algorithm for polynomials; irreducibility.
+        est_minutes: 14
+        prereqs: [aa-integral-domains, f2-polynomial-division]
+      - slug: aa-ideals
+        title: Ideals and quotient rings
+        description: Ideals as kernels; construction of quotient rings.
+        est_minutes: 14
+        prereqs: [aa-polynomial-rings, aa-quotient-groups]
+      - slug: aa-ring-homomorphisms
+        title: Ring homomorphisms
+        description: The first isomorphism theorem for rings.
+        est_minutes: 12
+        prereqs: [aa-ideals, aa-homomorphisms]
+      - slug: aa-field-extensions
+        title: Field extensions
+        description: Adjoining roots; finite fields in brief.
+        est_minutes: 14
+        prereqs: [aa-ring-homomorphisms]

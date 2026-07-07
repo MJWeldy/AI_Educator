@@ -1,0 +1,88 @@
+slug: mmps-i
+title: Mathematical Methods for the Physical Sciences I
+description: >
+  The working mathematics of physics and engineering: complex methods,
+  oscillations, Fourier analysis, vector calculus in field theories, and the
+  matrix methods behind coupled systems.
+sequence_order: 120
+units:
+  - title: Tools of the Trade
+    topics:
+      - slug: mmps1-dimensional-analysis
+        title: Dimensional analysis and estimation
+        description: Units, scaling arguments, and sanity checks.
+        est_minutes: 10
+        prereqs: [rates-unit-rates, scientific-notation]
+      - slug: mmps1-complex-methods
+        title: Complex numbers in physics
+        description: Phasors; Euler's formula as a computational tool.
+        est_minutes: 12
+        prereqs: [f3-complex-polar]
+      - slug: mmps1-coordinate-systems
+        title: Curvilinear coordinates
+        description: Polar, cylindrical, and spherical coordinates in physical problems.
+        est_minutes: 12
+        prereqs: [mvc-cylindrical-spherical]
+  - title: Oscillations
+    topics:
+      - slug: mmps1-shm
+        title: Simple harmonic motion
+        description: The harmonic oscillator ODE and its solutions.
+        est_minutes: 14
+        prereqs: [de-complex-repeated-roots, mmps1-complex-methods]
+      - slug: mmps1-damped-driven
+        title: Damped and driven oscillators
+        description: Quality factors, resonance curves, and steady state.
+        est_minutes: 14
+        prereqs: [mmps1-shm, de-oscillations]
+      - slug: mmps1-coupled-oscillators
+        title: Coupled oscillators and normal modes
+        description: Diagonalizing coupled systems into independent modes.
+        est_minutes: 16
+        prereqs: [mmps1-shm, la-diagonalization, de-eigen-method]
+  - title: Fourier Analysis
+    topics:
+      - slug: mmps1-fourier-series
+        title: Fourier series
+        description: Expanding periodic functions; coefficients and convergence.
+        est_minutes: 16
+        prereqs: [f3-integration-by-parts, mmps1-shm, f3-series-convergence]
+      - slug: mmps1-fourier-transform
+        title: The Fourier transform
+        description: From series to transforms; the frequency domain.
+        est_minutes: 16
+        prereqs: [mmps1-fourier-series, f3-improper-integrals]
+      - slug: mmps1-dirac-delta
+        title: The Dirac delta
+        description: Impulses, sifting, and delta identities.
+        est_minutes: 12
+        prereqs: [mmps1-fourier-transform, de-step-impulse]
+  - title: Fields
+    topics:
+      - slug: mmps1-vector-calc-physics
+        title: Gradient, divergence, and curl in physics
+        description: Fields, fluxes, and circulation with physical meaning.
+        est_minutes: 14
+        prereqs: [mvc-curl-divergence, mmps1-coordinate-systems]
+      - slug: mmps1-integral-theorems
+        title: The integral theorems at work
+        description: Gauss's and Stokes' theorems in electromagnetism and fluids.
+        est_minutes: 14
+        prereqs: [mmps1-vector-calc-physics, mvc-divergence-theorem, mvc-stokes]
+      - slug: mmps1-exact-differentials
+        title: Exact differentials and thermodynamic partials
+        description: Path independence, Maxwell-style relations, Legendre transforms.
+        est_minutes: 14
+        prereqs: [de-exact, mvc-chain-rule]
+  - title: Linear Methods
+    topics:
+      - slug: mmps1-eigenproblems
+        title: Eigenproblems in physics
+        description: Principal axes, stability, and small oscillations as eigenproblems.
+        est_minutes: 14
+        prereqs: [la-symmetric-spectral, mmps1-coupled-oscillators]
+      - slug: mmps1-odes-physics
+        title: ODE methods for physical systems
+        description: Choosing and applying solution techniques on physical models.
+        est_minutes: 14
+        prereqs: [de-laplace-ivps, mmps1-damped-driven]

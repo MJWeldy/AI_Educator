@@ -1,0 +1,135 @@
+slug: multivariable-calculus
+title: Multivariable Calculus
+description: >
+  Calculus in higher dimensions: partial derivatives, gradients, multiple
+  integrals, and the vector calculus of line and surface integrals through the
+  big theorems of Green, Stokes, and Gauss.
+sequence_order: 60
+units:
+  - title: Space & Surfaces
+    topics:
+      - slug: mvc-3d-coordinates
+        title: Three-dimensional coordinates
+        description: Points, distance, spheres, and planes in R³.
+        est_minutes: 10
+        prereqs: [la-vectors]
+      - slug: mvc-lines-planes
+        title: Lines and planes in space
+        description: Parametric lines; plane equations via normals.
+        est_minutes: 12
+        prereqs: [mvc-3d-coordinates, la-cross-product]
+      - slug: mvc-functions-several-variables
+        title: Functions of several variables
+        description: Graphs, level curves, and level surfaces.
+        est_minutes: 12
+        prereqs: [mvc-3d-coordinates, f3-transformations]
+      - slug: mvc-vector-functions
+        title: Vector-valued functions and curves
+        description: Parametrized curves; velocity and acceleration; arc length.
+        est_minutes: 12
+        prereqs: [mvc-lines-planes, f3-chain-rule]
+  - title: Partial Derivatives
+    topics:
+      - slug: mvc-partial-derivatives
+        title: Partial derivatives
+        description: Rates of change in coordinate directions; higher partials.
+        est_minutes: 12
+        prereqs: [mvc-functions-several-variables, f3-trig-exp-log-derivatives]
+      - slug: mvc-tangent-planes
+        title: Tangent planes and linear approximation
+        description: Local linearity and differentials.
+        est_minutes: 12
+        prereqs: [mvc-partial-derivatives, mvc-lines-planes]
+      - slug: mvc-chain-rule
+        title: The multivariable chain rule
+        description: Composite dependence; tree diagrams.
+        est_minutes: 12
+        prereqs: [mvc-partial-derivatives]
+      - slug: mvc-gradient
+        title: Gradient and directional derivatives
+        description: Steepest ascent; gradients normal to level sets.
+        est_minutes: 14
+        prereqs: [mvc-chain-rule, la-dot-product]
+      - slug: mvc-optimization
+        title: Multivariable optimization
+        description: Critical points and the second derivative test.
+        est_minutes: 14
+        prereqs: [mvc-gradient, f3-optimization]
+      - slug: mvc-lagrange
+        title: Lagrange multipliers
+        description: Constrained optimization.
+        est_minutes: 14
+        prereqs: [mvc-optimization]
+        resources:
+          - kind: reading
+            title: MIT OCW 18.02 — Multivariable Calculus
+            url: https://ocw.mit.edu/courses/18-02sc-multivariable-calculus-fall-2010/
+  - title: Multiple Integrals
+    topics:
+      - slug: mvc-double-integrals
+        title: Double integrals
+        description: Volume under surfaces; iterated integrals; order of integration.
+        est_minutes: 14
+        prereqs: [mvc-functions-several-variables, f3-integral-applications]
+      - slug: mvc-polar-integrals
+        title: Double integrals in polar coordinates
+        description: Circular regions and the r dr dθ element.
+        est_minutes: 12
+        prereqs: [mvc-double-integrals, f3-unit-circle]
+      - slug: mvc-triple-integrals
+        title: Triple integrals
+        description: Integration over solids.
+        est_minutes: 12
+        prereqs: [mvc-double-integrals]
+      - slug: mvc-cylindrical-spherical
+        title: Cylindrical and spherical coordinates
+        description: Choosing coordinates; Jacobian volume elements.
+        est_minutes: 14
+        prereqs: [mvc-triple-integrals, mvc-polar-integrals]
+      - slug: mvc-change-of-variables
+        title: Change of variables and Jacobians
+        description: General substitutions in multiple integrals.
+        est_minutes: 12
+        prereqs: [mvc-cylindrical-spherical, la-determinants]
+  - title: Vector Calculus
+    topics:
+      - slug: mvc-vector-fields
+        title: Vector fields
+        description: Fields in the plane and space; flow interpretation.
+        est_minutes: 10
+        prereqs: [mvc-gradient]
+      - slug: mvc-line-integrals
+        title: Line integrals
+        description: Work along curves; scalar and vector line integrals.
+        est_minutes: 14
+        prereqs: [mvc-vector-fields, mvc-vector-functions]
+      - slug: mvc-conservative-fields
+        title: Conservative fields and potentials
+        description: Path independence; finding potential functions.
+        est_minutes: 12
+        prereqs: [mvc-line-integrals]
+      - slug: mvc-greens-theorem
+        title: Green's theorem
+        description: Circulation and flux forms in the plane.
+        est_minutes: 14
+        prereqs: [mvc-conservative-fields, mvc-double-integrals]
+      - slug: mvc-curl-divergence
+        title: Curl and divergence
+        description: Local rotation and expansion of fields.
+        est_minutes: 12
+        prereqs: [mvc-greens-theorem, la-cross-product]
+      - slug: mvc-surface-integrals
+        title: Surface integrals
+        description: Parametrized surfaces; flux through surfaces.
+        est_minutes: 14
+        prereqs: [mvc-curl-divergence, mvc-change-of-variables]
+      - slug: mvc-stokes
+        title: Stokes' theorem
+        description: Circulation and curl on surfaces with boundary.
+        est_minutes: 14
+        prereqs: [mvc-surface-integrals]
+      - slug: mvc-divergence-theorem
+        title: The divergence theorem
+        description: Flux through closed surfaces as a volume integral.
+        est_minutes: 14
+        prereqs: [mvc-surface-integrals]

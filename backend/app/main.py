@@ -4,7 +4,19 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
 from . import models  # noqa: F401 — register tables on Base
-from .api import courses, diagnostic, learn, llm, settings as settings_api, stats, tasks, topics
+from . import jobs
+from .api import (
+    courses,
+    diagnostic,
+    documents,
+    learn,
+    llm,
+    settings as settings_api,
+    stats,
+    tasks,
+    topics,
+)
+from .ingest import pipeline  # noqa: F401 — registers the ingest_document job handler
 from .config import settings
 from .content.loader import load_seed
 from .db import Base, SessionLocal, engine
@@ -15,6 +27,7 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(engine)
     with SessionLocal() as db:
         load_seed(db)
+    jobs.resume_pending()
     yield
 
 
@@ -27,6 +40,7 @@ app.include_router(stats.router)
 app.include_router(diagnostic.router)
 app.include_router(llm.router)
 app.include_router(settings_api.router)
+app.include_router(documents.router)
 
 
 @app.get("/api/health")

@@ -26,10 +26,15 @@ MASTER_THRESHOLD = 0.8
 
 
 def start_session(db: Session, profile_id: int, course_slugs: list[str], graph: TopicGraph) -> DiagnosticSession:
+    from ..models import Problem
+
+    with_problems = set(
+        db.scalars(select(Problem.topic_id).where(Problem.answer_verified.is_(True)))
+    )
     scope_ids = [
         t.id
         for t in graph.topics.values()
-        if t.course.slug in course_slugs and t.generator_keys
+        if t.course.slug in course_slugs and (t.generator_keys or t.id in with_problems)
     ]
     session = DiagnosticSession(
         profile_id=profile_id,

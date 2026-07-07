@@ -20,20 +20,13 @@ QUIZ_SIZE = 8
 REVIEW_XP_SHARE = 0.5  # reviews fill at most half of the daily goal
 
 
-def _review_problem(topic: Topic, rng: random.Random) -> dict | None:
-    from ..content.generators import REGISTRY
+def _review_problem(db: Session, topic: Topic, rng: random.Random) -> dict | None:
+    from ..content.serving import pick_problem
 
-    keys = [k for k in topic.generator_keys if k in REGISTRY]
-    if not keys:
+    served = pick_problem(db, topic, 2, rng=rng, verified_only=True)
+    if served is None:
         return None
-    return {
-        "topic_id": topic.id,
-        "generator_key": rng.choice(keys),
-        "seed": rng.randrange(1, 2**31),
-        "difficulty": 2,
-        "done": False,
-        "correct": None,
-    }
+    return {"topic_id": topic.id, **served.ref(), "done": False, "correct": None}
 
 
 def _due_states(db: Session, profile_id: int, now: datetime) -> list[UserTopicState]:
@@ -102,7 +95,7 @@ def build_today(db: Session, profile_id: int, now: datetime | None = None) -> li
             topic = graph.topics.get(s.topic_id)
             if topic is None:
                 continue
-            p = _review_problem(topic, rng)
+            p = _review_problem(db, topic, rng)
             if p:
                 problems.append(p)
         if not problems:
@@ -140,7 +133,7 @@ def build_today(db: Session, profile_id: int, now: datetime | None = None) -> li
         for s in chosen:
             topic = graph.topics.get(s.topic_id)
             if topic:
-                p = _review_problem(topic, rng)
+                p = _review_problem(db, topic, rng)
                 if p:
                     problems.append(p)
         if problems:

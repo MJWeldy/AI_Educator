@@ -1,0 +1,257 @@
+slug: foundations-ii
+title: Mathematical Foundations II
+description: >
+  Algebra in earnest: linear equations and systems, functions, polynomials and
+  factoring, quadratics, radicals, rational expressions, exponentials and
+  logarithms, and sequences.
+sequence_order: 20
+units:
+  - title: Linear Equations & Inequalities
+    topics:
+      - slug: f2-multi-step-equations
+        title: Multi-step equations
+        description: Solving equations requiring distribution and combining like terms.
+        est_minutes: 12
+        prereqs: [two-step-equations]
+      - slug: f2-variables-both-sides
+        title: Equations with variables on both sides
+        description: Collecting variable terms; identities and contradictions.
+        est_minutes: 10
+        prereqs: [f2-multi-step-equations]
+      - slug: f2-literal-equations
+        title: Literal equations and formulas
+        description: Solving for one variable in terms of others.
+        est_minutes: 10
+        prereqs: [f2-variables-both-sides]
+      - slug: f2-compound-inequalities
+        title: Compound inequalities
+        description: And/or inequalities and interval notation.
+        est_minutes: 10
+        prereqs: [intro-inequalities]
+      - slug: f2-absolute-value-equations
+        title: Absolute value equations and inequalities
+        description: Splitting into cases.
+        est_minutes: 12
+        prereqs: [absolute-value, f2-multi-step-equations, f2-compound-inequalities]
+    resources: []
+  - title: Linear Functions & Graphs
+    topics:
+      - slug: f2-slope
+        title: Slope
+        description: Rate of change between points; slope from a graph or two points.
+        est_minutes: 10
+        prereqs: [coordinate-plane, divide-fractions]
+      - slug: f2-slope-intercept
+        title: Slope-intercept form
+        description: Graphing and writing y = mx + b.
+        est_minutes: 10
+        prereqs: [f2-slope, f2-multi-step-equations]
+      - slug: f2-point-slope
+        title: Point-slope and standard form
+        description: Writing line equations from points; converting between forms.
+        est_minutes: 10
+        prereqs: [f2-slope-intercept]
+      - slug: f2-parallel-perpendicular
+        title: Parallel and perpendicular lines
+        description: Slope relationships between lines.
+        est_minutes: 8
+        prereqs: [f2-point-slope]
+      - slug: f2-linear-inequalities-2var
+        title: Linear inequalities in two variables
+        description: Graphing half-planes.
+        est_minutes: 8
+        prereqs: [f2-slope-intercept, f2-compound-inequalities]
+        resources:
+          - kind: reading
+            title: Khan Academy — Linear equations and graphs
+            url: https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:linear-equations-graphs
+  - title: Systems of Equations
+    topics:
+      - slug: f2-systems-graphing
+        title: Systems by graphing
+        description: Solutions as intersection points; special cases.
+        est_minutes: 10
+        prereqs: [f2-slope-intercept]
+      - slug: f2-systems-substitution
+        title: Systems by substitution
+        description: Solving one equation for a variable and substituting.
+        est_minutes: 12
+        prereqs: [f2-systems-graphing, f2-variables-both-sides]
+      - slug: f2-systems-elimination
+        title: Systems by elimination
+        description: Adding scaled equations to eliminate a variable.
+        est_minutes: 12
+        prereqs: [f2-systems-substitution]
+      - slug: f2-systems-applications
+        title: Applications of systems
+        description: Mixture, rate, and money word problems.
+        est_minutes: 14
+        prereqs: [f2-systems-elimination]
+  - title: Functions
+    topics:
+      - slug: f2-function-notation
+        title: Functions and function notation
+        description: Functions as input-output rules; evaluating f(x).
+        est_minutes: 10
+        prereqs: [evaluate-expressions, coordinate-plane]
+      - slug: f2-domain-range
+        title: Domain and range
+        description: Finding valid inputs and possible outputs.
+        est_minutes: 10
+        prereqs: [f2-function-notation]
+      - slug: f2-graph-reading
+        title: Interpreting graphs of functions
+        description: Intercepts, increasing/decreasing intervals, and rates from graphs.
+        est_minutes: 10
+        prereqs: [f2-domain-range]
+  - title: Polynomials & Factoring
+    topics:
+      - slug: f2-polynomial-add-sub
+        title: Adding and subtracting polynomials
+        description: Combining like terms across polynomials.
+        est_minutes: 8
+        prereqs: [combine-like-terms]
+      - slug: f2-polynomial-multiply
+        title: Multiplying polynomials
+        description: Distributing binomials and beyond (FOIL and the box method).
+        est_minutes: 12
+        prereqs: [f2-polynomial-add-sub, distributive-property, exponent-rules]
+      - slug: f2-special-products
+        title: Special products
+        description: Squares of binomials and difference of squares.
+        est_minutes: 8
+        prereqs: [f2-polynomial-multiply]
+      - slug: f2-factor-gcf
+        title: Factoring out the GCF
+        description: Reversing the distributive property.
+        est_minutes: 8
+        prereqs: [f2-polynomial-multiply, gcf]
+      - slug: f2-factor-trinomials
+        title: Factoring trinomials
+        description: x² + bx + c and ax² + bx + c.
+        est_minutes: 14
+        prereqs: [f2-factor-gcf, f2-special-products]
+      - slug: f2-factor-special
+        title: Factoring special forms
+        description: Difference of squares, perfect square trinomials, grouping.
+        est_minutes: 10
+        prereqs: [f2-factor-trinomials]
+      - slug: f2-polynomial-division
+        title: Polynomial long and synthetic division
+        description: Dividing polynomials; the remainder theorem.
+        est_minutes: 12
+        prereqs: [f2-factor-trinomials]
+  - title: Quadratics
+    topics:
+      - slug: f2-quadratic-solve-factoring
+        title: Solving quadratics by factoring
+        description: Zero-product property.
+        est_minutes: 10
+        prereqs: [f2-factor-trinomials]
+      - slug: f2-quadratic-graphs
+        title: Graphs of quadratic functions
+        description: Parabolas, vertex, axis of symmetry.
+        est_minutes: 12
+        prereqs: [f2-quadratic-solve-factoring, f2-graph-reading]
+      - slug: f2-completing-square
+        title: Completing the square
+        description: Rewriting quadratics in vertex form.
+        est_minutes: 12
+        prereqs: [f2-quadratic-graphs, f2-special-products]
+      - slug: f2-quadratic-formula
+        title: The quadratic formula
+        description: Deriving and applying it; the discriminant.
+        est_minutes: 12
+        prereqs: [f2-completing-square, square-roots]
+      - slug: f2-quadratic-applications
+        title: Quadratic applications
+        description: Projectiles, areas, and max/min word problems.
+        est_minutes: 14
+        prereqs: [f2-quadratic-formula]
+        resources:
+          - kind: reading
+            title: Khan Academy — Quadratics
+            url: https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:quadratic-functions-equations
+  - title: Radicals & Rational Exponents
+    topics:
+      - slug: f2-integer-exponents
+        title: Integer exponents
+        description: Negative and zero exponents; all the exponent laws.
+        est_minutes: 10
+        prereqs: [exponent-rules]
+      - slug: f2-rational-exponents
+        title: Rational exponents
+        description: Fractional powers as roots.
+        est_minutes: 10
+        prereqs: [f2-integer-exponents, square-roots]
+      - slug: f2-simplify-radicals
+        title: Simplifying radical expressions
+        description: Extracting square factors; rationalizing denominators.
+        est_minutes: 12
+        prereqs: [f2-rational-exponents, prime-factorization]
+      - slug: f2-radical-equations
+        title: Radical equations
+        description: Isolating radicals and checking for extraneous roots.
+        est_minutes: 10
+        prereqs: [f2-simplify-radicals, f2-quadratic-solve-factoring]
+  - title: Rational Expressions
+    topics:
+      - slug: f2-rational-simplify
+        title: Simplifying rational expressions
+        description: Factoring and cancelling; excluded values.
+        est_minutes: 10
+        prereqs: [f2-factor-trinomials, simplify-fractions]
+      - slug: f2-rational-mult-div
+        title: Multiplying and dividing rational expressions
+        description: Products and quotients of algebraic fractions.
+        est_minutes: 10
+        prereqs: [f2-rational-simplify, multiply-fractions]
+      - slug: f2-rational-add-sub
+        title: Adding and subtracting rational expressions
+        description: Common denominators with polynomials.
+        est_minutes: 12
+        prereqs: [f2-rational-mult-div, add-sub-unlike-fractions]
+      - slug: f2-rational-equations
+        title: Rational equations
+        description: Clearing denominators; extraneous solutions.
+        est_minutes: 12
+        prereqs: [f2-rational-add-sub]
+  - title: Exponentials & Logarithms
+    topics:
+      - slug: f2-exponential-functions
+        title: Exponential functions
+        description: Growth and decay curves; evaluating and graphing b^x.
+        est_minutes: 10
+        prereqs: [f2-integer-exponents, f2-function-notation]
+      - slug: f2-growth-decay
+        title: Exponential growth and decay models
+        description: Compound interest, half-life, doubling time.
+        est_minutes: 12
+        prereqs: [f2-exponential-functions, percent-change]
+      - slug: f2-logarithms
+        title: Logarithms
+        description: Logs as inverse exponentials; evaluating logs.
+        est_minutes: 12
+        prereqs: [f2-exponential-functions]
+      - slug: f2-log-properties
+        title: Properties of logarithms
+        description: Product, quotient, and power rules; change of base.
+        est_minutes: 12
+        prereqs: [f2-logarithms]
+      - slug: f2-exp-log-equations
+        title: Exponential and logarithmic equations
+        description: Solving with logs and exponentials.
+        est_minutes: 12
+        prereqs: [f2-log-properties]
+  - title: Sequences
+    topics:
+      - slug: f2-arithmetic-sequences
+        title: Arithmetic sequences
+        description: Common differences, explicit and recursive forms, sums.
+        est_minutes: 10
+        prereqs: [f2-function-notation]
+      - slug: f2-geometric-sequences
+        title: Geometric sequences
+        description: Common ratios, explicit forms, finite geometric sums.
+        est_minutes: 10
+        prereqs: [f2-arithmetic-sequences, f2-exponential-functions]

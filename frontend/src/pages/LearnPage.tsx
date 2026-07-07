@@ -43,6 +43,21 @@ export default function LearnPage() {
   const [xpEarned, setXpEarned] = useState(0)
   const [startedAt, setStartedAt] = useState(Date.now())
   const [generating, setGenerating] = useState(false)
+  const [generatingProblems, setGeneratingProblems] = useState(false)
+
+  const generateProblems = async () => {
+    setGeneratingProblems(true)
+    try {
+      await api<{ created: number }>(`/api/llm/topics/${topicId}/problems`, { method: 'POST' })
+      const s = await api<LearnState>(`/api/learn/${topicId}`)
+      setState(s)
+      setProblem(s.problem)
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setGeneratingProblems(false)
+    }
+  }
 
   const generateLesson = async () => {
     setGenerating(true)
@@ -205,9 +220,12 @@ export default function LearnPage() {
               />
             </div>
           ) : (
-            <p className="muted rise rise-3">
-              This topic has no practice problems yet — mark it done from the lesson for now.
-            </p>
+            <div className="rise rise-3">
+              <p className="muted">This topic has no practice problems yet.</p>
+              <button className="btn" onClick={generateProblems} disabled={generatingProblems}>
+                {generatingProblems ? 'Writing problems… (can take a minute)' : 'Generate problems with AI →'}
+              </button>
+            </div>
           )}
         </>
       )}

@@ -17,7 +17,8 @@ import TaskPage from './pages/TaskPage'
 import StatsPage from './pages/StatsPage'
 import DiagnosticPage from './pages/DiagnosticPage'
 import SettingsPage from './pages/SettingsPage'
-import Placeholder from './pages/Placeholder'
+import UploadPage from './pages/UploadPage'
+import DocumentReviewPage from './pages/DocumentReviewPage'
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
@@ -33,15 +34,8 @@ const router = createBrowserRouter([
       { path: '/courses/:slug', element: <CourseMapPage /> },
       { path: '/topics/:topicId', element: <TopicPage /> },
       { path: '/learn/:topicId', element: <LearnPage /> },
-      {
-        path: '/upload',
-        element: (
-          <Placeholder
-            title="Upload a book"
-            note="Turn any textbook PDF into a course the app can teach. Arrives in Phase 6."
-          />
-        ),
-      },
+      { path: '/upload', element: <UploadPage /> },
+      { path: '/documents/:docId', element: <DocumentReviewPage /> },
       { path: '/stats', element: <StatsPage /> },
       { path: '/diagnostic', element: <DiagnosticPage /> },
       { path: '/settings', element: <SettingsPage /> },

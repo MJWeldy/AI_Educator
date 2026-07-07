@@ -1,6 +1,7 @@
 from . import (  # noqa: F401 — importing registers every generator
     algebra,
     arithmetic,
+    data_prob,
     decimals,
     earlymath,
     exponents,

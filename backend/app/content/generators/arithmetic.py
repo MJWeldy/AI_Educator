@@ -136,3 +136,35 @@ def order_of_operations(rng: random.Random, difficulty: int) -> ProblemInstance:
         parts=[numeric("Value:", val)],
         solution_md=steps,
     )
+
+
+CONVERSIONS = [
+    ("m", "cm", 100), ("km", "m", 1000), ("cm", "mm", 10),
+    ("kg", "g", 1000), ("L", "mL", 1000),
+]
+
+
+@generator("arithmetic.unit_conversion")
+def unit_conversion(rng: random.Random, difficulty: int) -> ProblemInstance:
+    if difficulty == 3:
+        h, m = rng.randint(1, 5), rng.choice([10, 15, 20, 30, 40, 45, 50])
+        return ProblemInstance(
+            statement_md=f"A trip takes ${h}$ hours and ${m}$ minutes.",
+            parts=[numeric("How many minutes is that in total?", h * 60 + m)],
+            solution_md=f"${h} \\times 60 + {m} = {h * 60 + m}$ minutes.",
+        )
+    big, small, factor = rng.choice(CONVERSIONS)
+    if difficulty == 1:
+        n = rng.randint(2, 30)
+        return ProblemInstance(
+            statement_md=f"Convert ${n}$ {big} to {small}.",
+            parts=[numeric(f"Value in {small}:", n * factor)],
+            solution_md=f"$1$ {big} $= {factor}$ {small}, so ${n} \\times {factor} = {n * factor}$.",
+        )
+    from decimal import Decimal
+    n = Decimal(rng.randint(11, 99)) / 10
+    return ProblemInstance(
+        statement_md=f"Convert ${n}$ {big} to {small}.",
+        parts=[numeric(f"Value in {small}:", int(n * factor))],
+        solution_md=f"${n} \\times {factor} = {int(n * factor)}$ {small}.",
+    )

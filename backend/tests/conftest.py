@@ -7,6 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
+from app import models  # noqa: F401 — register every table on Base before create_all
 from app.db import Base
 
 

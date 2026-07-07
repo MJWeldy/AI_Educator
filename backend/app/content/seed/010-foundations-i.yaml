@@ -6,7 +6,7 @@ description: >
 level: Grades 3–8
 sequence_order: 10
 units:
-  - title: Whole Numbers
+  - title: Whole Numbers (Grades 3–4)
     topics:
       - slug: place-value
         title: Place value
@@ -151,7 +151,7 @@ units:
             solution: |
               Parentheses: $18-6=12$. Division: $12 \div 3 = 4$. Then $4 + 2 = 6$.
 
-  - title: Integers
+  - title: Integers (Grades 6–7)
     topics:
       - slug: negative-numbers
         title: Negative numbers and the number line
@@ -232,7 +232,7 @@ units:
         generators: [integers.absolute_value]
         prereqs: [negative-numbers]
 
-  - title: Factors & Multiples
+  - title: Factors & Multiples (Grade 4+)
     topics:
       - slug: divisibility-rules
         title: Divisibility rules
@@ -294,7 +294,7 @@ units:
         generators: [numtheory.lcm]
         prereqs: [prime-factorization]
 
-  - title: Fractions
+  - title: Fractions (Grades 3–5)
     topics:
       - slug: fraction-meaning
         title: What fractions mean
@@ -422,7 +422,7 @@ units:
         generators: [fractions.mixed_ops]
         prereqs: [mixed-numbers, add-sub-unlike-fractions, multiply-fractions]
 
-  - title: Decimals
+  - title: Decimals (Grades 4–6)
     topics:
       - slug: decimal-place-value
         title: Decimal place value
@@ -476,7 +476,7 @@ units:
         generators: [decimals.from_fraction]
         prereqs: [decimal-place-value, simplify-fractions]
 
-  - title: Ratio, Proportion & Percent
+  - title: Ratio, Proportion & Percent (Grades 6–7)
     topics:
       - slug: ratios
         title: Ratios
@@ -537,7 +537,7 @@ units:
         generators: [percent.change]
         prereqs: [percent-of-number]
 
-  - title: Exponents & Roots
+  - title: Exponents & Roots (Grades 6–8)
     topics:
       - slug: exponent-basics
         title: Exponents
@@ -564,7 +564,7 @@ units:
         generators: [scinot.convert]
         prereqs: [exponent-basics, multiply-decimals]
 
-  - title: Expressions & Equations
+  - title: Expressions & Equations (Grades 6–8)
     topics:
       - slug: variables-expressions
         title: Variables and expressions
@@ -650,7 +650,7 @@ units:
         generators: [algebra.inequality]
         prereqs: [one-step-equations]
 
-  - title: Geometry & Measurement
+  - title: Geometry & Measurement (Grades 3–8)
     topics:
       - slug: perimeter-area
         title: Perimeter and area
@@ -664,3 +664,78 @@ units:
         est_minutes: 8
         generators: [geometry.coordinate_plane]
         prereqs: [negative-numbers]
+      - slug: measuring-angles
+        title: Angle relationships
+        description: Complementary, supplementary, vertical angles; triangle angle sums.
+        est_minutes: 10
+        generators: [geometry.angles]
+        prereqs: [whole-add-sub]
+        resources:
+          - kind: reading
+            title: Khan Academy — Basic geometry and measurement
+            url: https://www.khanacademy.org/math/basic-geo
+      - slug: unit-conversions
+        title: Converting units of measure
+        description: Metric length, mass, and volume; hours and minutes.
+        est_minutes: 8
+        generators: [arithmetic.unit_conversion]
+        prereqs: [multiply-decimals]
+      - slug: volume-solids
+        title: Volume
+        description: Volumes of boxes and cubes; surface area.
+        est_minutes: 10
+        generators: [geometry.volume]
+        prereqs: [perimeter-area, exponent-basics]
+      - slug: pythagorean-theorem
+        title: The Pythagorean theorem
+        description: Relating the sides of right triangles.
+        est_minutes: 12
+        generators: [geometry.pythagorean]
+        prereqs: [square-roots, perimeter-area]
+        lesson: |
+          In any **right triangle**, the two shorter sides (the *legs* $a$ and $b$) and
+          the longest side (the *hypotenuse* $c$, opposite the right angle) are locked
+          together by the Pythagorean theorem:
+
+          $$a^2 + b^2 = c^2$$
+
+          Squares built on the two legs together cover exactly the square built on the
+          hypotenuse. This lets you find any missing side of a right triangle:
+
+          - hypotenuse: $c = \sqrt{a^2 + b^2}$
+          - a leg: $a = \sqrt{c^2 - b^2}$
+
+          Some whole-number triples come up constantly: $(3,4,5)$, $(5,12,13)$, $(8,15,17)$.
+        worked_examples:
+          - problem: A right triangle has legs $6$ and $8$. Find the hypotenuse.
+            solution: |
+              $c = \sqrt{6^2 + 8^2} = \sqrt{36 + 64} = \sqrt{100} = 10$.
+          - problem: A $13$-unit ladder leans against a wall, with its base $5$ units out. How high does it reach?
+            solution: |
+              The ladder is the hypotenuse: height $= \sqrt{13^2 - 5^2} = \sqrt{144} = 12$ units.
+        resources:
+          - kind: reading
+            title: Khan Academy — 8th grade math
+            url: https://www.khanacademy.org/math/cc-eighth-grade-math
+  - title: Data & Probability (Grades 6–7)
+    topics:
+      - slug: mean-median-mode
+        title: Mean, median, and mode
+        description: Summarizing a data set with one number.
+        est_minutes: 10
+        generators: [data.mean_median_mode]
+        prereqs: [whole-divide]
+        resources:
+          - kind: reading
+            title: Khan Academy — 6th grade math
+            url: https://www.khanacademy.org/math/cc-sixth-grade-math
+      - slug: basic-probability
+        title: Basic probability
+        description: Probability as favorable outcomes over total outcomes.
+        est_minutes: 10
+        generators: [data.probability]
+        prereqs: [fraction-meaning, simplify-fractions]
+        resources:
+          - kind: reading
+            title: Khan Academy — 7th grade math
+            url: https://www.khanacademy.org/math/cc-seventh-grade-math

@@ -56,7 +56,7 @@ units:
         title: Right-triangle trigonometry
         description: Sine, cosine, tangent as ratios; solving right triangles.
         est_minutes: 12
-        prereqs: [f3-angles-radians, square-roots]
+        prereqs: [f3-angles-radians, pythagorean-theorem]
       - slug: f3-unit-circle
         title: The unit circle
         description: Trig values of special angles; reference angles; signs by quadrant.

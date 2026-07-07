@@ -3,6 +3,7 @@ title: Mathematical Foundations I
 description: >
   Arithmetic through pre-algebra: whole numbers, integers, fractions, decimals,
   ratios and percents, exponents, and first steps with variables and equations.
+level: Grades 3–8
 sequence_order: 10
 units:
   - title: Whole Numbers
@@ -12,6 +13,7 @@ units:
         description: Reading, writing, and decomposing whole numbers by place value.
         est_minutes: 8
         generators: [arithmetic.place_value]
+        prereqs: [em-tens-ones]
         lesson: |
           Every digit in a number has a **place value** determined by its position.
           In the number $4{,}736$:
@@ -42,7 +44,7 @@ units:
         description: Multi-digit addition and subtraction with regrouping.
         est_minutes: 10
         generators: [arithmetic.add_sub]
-        prereqs: [place-value]
+        prereqs: [place-value, em-word-problems]
         lesson: |
           To add or subtract multi-digit numbers, line up the digits by place value and
           work right to left, **regrouping** (carrying or borrowing) when a column
@@ -570,6 +572,10 @@ units:
         est_minutes: 8
         generators: [algebra.translate]
         prereqs: [order-of-operations]
+        resources:
+          - kind: reading
+            title: Khan Academy — Pre-algebra
+            url: https://www.khanacademy.org/math/pre-algebra
       - slug: evaluate-expressions
         title: Evaluating expressions
         description: Substituting values into expressions.

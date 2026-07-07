@@ -17,10 +17,11 @@ def client(seeded_db):
 
 
 def complete_place_value(client: TestClient) -> None:
+    """Completes the curriculum's root topic (early-math counting)."""
     from app.content.generators import make_instance
 
-    course = client.get("/api/courses/foundations-i").json()
-    tid = next(t["id"] for u in course["units"] for t in u["topics"] if t["slug"] == "place-value")
+    course = client.get("/api/courses/early-math").json()
+    tid = next(t["id"] for u in course["units"] for t in u["topics"] if t["slug"] == "em-counting")
     problem = client.get(f"/api/learn/{tid}").json()["problem"]
     for _ in range(8):
         inst = make_instance(problem["generator_key"], problem["seed"], problem["difficulty"])

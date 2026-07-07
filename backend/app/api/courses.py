@@ -17,6 +17,7 @@ def _summarize(course: Course, masteries: dict[int, str], topics: list[Topic]) -
         "slug": course.slug,
         "title": course.title,
         "description": course.description,
+        "level": course.level,
         "sequence_order": course.sequence_order,
         "source": course.source,
         "topic_count": len(topics),

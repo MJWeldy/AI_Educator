@@ -4,6 +4,7 @@ description: >
   Ordinary differential equations: first- and second-order methods, Laplace
   transforms, linear systems, qualitative analysis, and a first look at
   numerical methods.
+level: Undergraduate · OSSU core
 sequence_order: 100
 units:
   - title: First-Order Equations
@@ -45,6 +46,9 @@ units:
           - kind: reading
             title: Paul's Online Notes — Differential Equations
             url: https://tutorial.math.lamar.edu/Classes/DE/DE.aspx
+          - kind: video
+            title: Khan Academy — Differential equations
+            url: https://www.khanacademy.org/math/differential-equations
   - title: Second-Order Equations
     topics:
       - slug: de-second-order-homogeneous

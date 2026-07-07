@@ -32,6 +32,7 @@ class CourseSummary(BaseModel):
     slug: str
     title: str
     description: str
+    level: str = ""
     sequence_order: int
     source: str
     topic_count: int

@@ -35,6 +35,7 @@ class Course(Base):
     slug: Mapped[str] = mapped_column(String, unique=True, index=True)
     title: Mapped[str] = mapped_column(String)
     description: Mapped[str] = mapped_column(Text, default="")
+    level: Mapped[str] = mapped_column(String, default="")  # e.g. "Grades 3–8", "Undergraduate"
     sequence_order: Mapped[int] = mapped_column(Integer, default=0)
     source: Mapped[str] = mapped_column(String, default="seed")  # seed | document
     document_id: Mapped[int | None] = mapped_column(ForeignKey("documents.id"), nullable=True)

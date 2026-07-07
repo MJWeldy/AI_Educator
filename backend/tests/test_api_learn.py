@@ -30,7 +30,11 @@ def canonical_answers(problem: dict) -> list[str]:
 
 
 def topic_id_for(client: TestClient, slug: str) -> int:
-    course = client.get("/api/courses/foundations-i").json()
+    return topic_id_for_course(client, "foundations-i", slug)
+
+
+def topic_id_for_course(client: TestClient, course_slug: str, slug: str) -> int:
+    course = client.get(f"/api/courses/{course_slug}").json()
     for unit in course["units"]:
         for t in unit["topics"]:
             if t["slug"] == slug:
@@ -44,7 +48,7 @@ def test_locked_topic_rejected(client):
 
 
 def test_complete_lesson_end_to_end(client):
-    tid = topic_id_for(client, "place-value")
+    tid = topic_id_for_course(client, "early-math", "em-counting")
     state = client.get(f"/api/learn/{tid}").json()
     assert state["mastery"] == "unlocked"
     assert state["lesson"] is not None
@@ -74,15 +78,15 @@ def test_complete_lesson_end_to_end(client):
     assert out["mastery"] == "learned"
 
     # Completing the root topic unlocks its dependents.
-    course = client.get("/api/courses/foundations-i").json()
+    course = client.get("/api/courses/early-math").json()
     by_slug = {t["slug"]: t for u in course["units"] for t in u["topics"]}
-    assert by_slug["place-value"]["mastery"] == "learned"
-    assert by_slug["whole-add-sub"]["mastery"] == "unlocked"
-    assert by_slug["whole-multiply"]["mastery"] == "locked"
+    assert by_slug["em-counting"]["mastery"] == "learned"
+    assert by_slug["em-compare"]["mastery"] == "unlocked"
+    assert by_slug["em-tens-ones"]["mastery"] == "locked"
 
 
 def test_wrong_answer_reveals_solution_and_resets(client):
-    tid = topic_id_for(client, "place-value")
+    tid = topic_id_for_course(client, "early-math", "em-counting")
     state = client.get(f"/api/learn/{tid}").json()
     problem = state["problem"]
     out = client.post(

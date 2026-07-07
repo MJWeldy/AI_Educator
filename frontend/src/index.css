@@ -654,3 +654,18 @@ button {
 .profile-item.active { color: var(--accent); }
 .profile-item .xp { color: var(--ink-faint); font-size: 11px; }
 .profile-new { padding: 8px; border-bottom: 1px solid var(--rule); }
+
+.level-chip {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: normal;
+  letter-spacing: 0.06em;
+  color: var(--blue);
+  border: 1px solid var(--blue);
+  background: var(--blue-soft);
+  padding: 2px 9px;
+  border-radius: 999px;
+  margin-left: 12px;
+  vertical-align: 3px;
+  white-space: nowrap;
+}

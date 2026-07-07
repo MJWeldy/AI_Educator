@@ -31,6 +31,7 @@ export interface CourseSummary {
   slug: string
   title: string
   description: string
+  level: string
   sequence_order: number
   source: string
   topic_count: number

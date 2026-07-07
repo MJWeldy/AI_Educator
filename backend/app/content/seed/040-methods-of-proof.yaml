@@ -3,6 +3,7 @@ title: Methods of Proof
 description: >
   The bridge to advanced mathematics: logic, sets, and the standard proof
   techniques — direct proof, contrapositive, contradiction, cases, and induction.
+level: Undergraduate · OSSU core
 sequence_order: 40
 units:
   - title: Logic
@@ -31,6 +32,9 @@ units:
           - kind: reading
             title: Book of Proof (free) — Richard Hammack
             url: https://www.people.vcu.edu/~rhammack/BookOfProof/
+          - kind: video
+            title: Coursera — Introduction to Mathematical Thinking (OSSU)
+            url: https://www.coursera.org/learn/mathematical-thinking
   - title: Sets & Relations
     topics:
       - slug: mp-sets

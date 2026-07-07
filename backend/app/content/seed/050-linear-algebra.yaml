@@ -4,6 +4,7 @@ description: >
   Vectors, matrices, and linear maps: systems of equations, vector spaces,
   determinants, eigenvalues, orthogonality, and the decompositions that power
   applied mathematics.
+level: Undergraduate · OSSU core
 sequence_order: 50
 units:
   - title: Vectors
@@ -66,8 +67,11 @@ units:
         prereqs: [la-inverse-matrices]
         resources:
           - kind: video
-            title: MIT 18.06 — Gilbert Strang's Linear Algebra
+            title: MIT 18.06 — Gilbert Strang's Linear Algebra (OSSU)
             url: https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/
+          - kind: reading
+            title: Khan Academy — Linear algebra
+            url: https://www.khanacademy.org/math/linear-algebra
   - title: Determinants
     topics:
       - slug: la-determinants

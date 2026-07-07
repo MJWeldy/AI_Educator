@@ -1,0 +1,104 @@
+slug: early-math
+title: Early Math
+description: >
+  Counting, comparing, early addition and subtraction, tens and ones, time,
+  money, and shapes — the very first steps, aligned with Khan Academy's
+  early-grade courses.
+level: Grades K–2
+sequence_order: 5
+units:
+  - title: Counting & Comparing
+    topics:
+      - slug: em-counting
+        title: Counting forward and backward
+        description: What comes before and after a number.
+        est_minutes: 6
+        generators: [earlymath.count_sequence]
+        lesson: |
+          Numbers march in a line, always in the same order:
+
+          $$1,\ 2,\ 3,\ 4,\ 5,\ 6,\ 7,\ 8,\ 9,\ 10,\ \ldots$$
+
+          Counting **forward** means taking one step to the right — every number is
+          one **more** than the number before it. Counting **backward** means one
+          step to the left — one **less** each time.
+
+          So the number right **after** $7$ is $8$, and the number right **before**
+          $7$ is $6$. This works for big numbers too: right after $99$ comes $100$.
+        worked_examples:
+          - problem: What number comes right after $12$?
+            solution: |
+              One more than $12$ is $13$.
+          - problem: What number comes right before $20$?
+            solution: |
+              One less than $20$ is $19$.
+        resources:
+          - kind: video
+            title: Khan Academy — Early math (K–2)
+            url: https://www.khanacademy.org/math/early-math
+      - slug: em-compare
+        title: Comparing numbers
+        description: Which is greater, which is less, and by how much.
+        est_minutes: 6
+        generators: [earlymath.compare_numbers]
+        prereqs: [em-counting]
+      - slug: em-skip-counting
+        title: Skip counting
+        description: Counting by 2s, 5s, 10s, and 100s.
+        est_minutes: 8
+        generators: [earlymath.skip_count]
+        prereqs: [em-counting]
+  - title: Addition & Subtraction
+    topics:
+      - slug: em-add-within-20
+        title: Addition within 20
+        description: Sums up to 20, including missing addends.
+        est_minutes: 8
+        generators: [earlymath.add_within_20]
+        prereqs: [em-counting]
+        resources:
+          - kind: video
+            title: Khan Academy — 1st grade
+            url: https://www.khanacademy.org/math/cc-1st-grade-math
+      - slug: em-sub-within-20
+        title: Subtraction within 20
+        description: Differences within 20, including missing numbers.
+        est_minutes: 8
+        generators: [earlymath.sub_within_20]
+        prereqs: [em-add-within-20]
+      - slug: em-word-problems
+        title: Addition and subtraction word problems
+        description: Deciding whether a story means adding or taking away.
+        est_minutes: 8
+        generators: [earlymath.word_problems]
+        prereqs: [em-sub-within-20]
+      - slug: em-tens-ones
+        title: Tens and ones
+        description: Two- and three-digit numbers as tens and ones.
+        est_minutes: 8
+        generators: [earlymath.tens_ones]
+        prereqs: [em-add-within-20, em-skip-counting]
+        resources:
+          - kind: video
+            title: Khan Academy — 2nd grade
+            url: https://www.khanacademy.org/math/cc-2nd-grade-math
+  - title: Time, Money & Shapes
+    topics:
+      - slug: em-telling-time
+        title: Telling time
+        description: Reading clocks and minutes until the hour.
+        est_minutes: 8
+        generators: [earlymath.telling_time]
+        prereqs: [em-skip-counting]
+      - slug: em-money
+        title: Counting money
+        description: Quarters, dimes, nickels, and pennies.
+        est_minutes: 8
+        generators: [earlymath.money]
+        prereqs: [em-skip-counting, em-add-within-20]
+      - slug: em-shapes
+        title: Shapes
+        description: Sides and corners of common shapes.
+        est_minutes: 6
+        generators: [earlymath.shapes]
+        prereqs: [em-counting]

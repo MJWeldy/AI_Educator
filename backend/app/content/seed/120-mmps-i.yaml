@@ -4,6 +4,7 @@ description: >
   The working mathematics of physics and engineering: complex methods,
   oscillations, Fourier analysis, vector calculus in field theories, and the
   matrix methods behind coupled systems.
+level: Undergraduate (physics)
 sequence_order: 120
 units:
   - title: Tools of the Trade

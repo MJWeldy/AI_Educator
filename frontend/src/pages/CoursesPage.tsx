@@ -27,7 +27,10 @@ export default function CoursesPage() {
             to={`/courses/${c.slug}`}
             className={`course-card rise rise-${Math.min(i + 2, 4)}`}
           >
-            <h2>{c.title}</h2>
+            <h2>
+              {c.title}
+              {c.level && <span className="level-chip">{c.level}</span>}
+            </h2>
             <p>{c.description}</p>
             <div className="progress-rail">
               <div className="learned" style={{ width: `${learnedPct}%` }} />

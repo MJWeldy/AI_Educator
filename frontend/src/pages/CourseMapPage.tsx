@@ -23,7 +23,7 @@ export default function CourseMapPage() {
 
   return (
     <>
-      <div className="page-kicker rise">Course</div>
+      <div className="page-kicker rise">Course{course.level ? ` · ${course.level}` : ''}</div>
       <h1 className="page-title rise rise-1">{course.title}</h1>
       <p className="page-sub rise rise-2">{course.description}</p>
 

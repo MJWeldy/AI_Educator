@@ -4,6 +4,7 @@ description: >
   Probability from axioms through distributions and limit theorems, then
   statistical inference: estimation, confidence intervals, hypothesis testing,
   and regression.
+level: Undergraduate · OSSU core
 sequence_order: 90
 units:
   - title: Probability Foundations
@@ -42,6 +43,15 @@ units:
           - kind: video
             title: StatQuest with Josh Starmer
             url: https://www.youtube.com/@statquest
+          - kind: reading
+            title: MIT OCW 18.05 — Introduction to Probability and Statistics (OSSU)
+            url: https://ocw.mit.edu/courses/18-05-introduction-to-probability-and-statistics-spring-2022/
+          - kind: reading
+            title: Khan Academy — Statistics and probability
+            url: https://www.khanacademy.org/math/statistics-probability
+          - kind: link
+            title: Seeing Theory — visual introduction to probability
+            url: https://seeingtheory.brown.edu/
   - title: Random Variables
     topics:
       - slug: ps-random-variables

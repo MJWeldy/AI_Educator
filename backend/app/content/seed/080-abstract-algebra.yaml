@@ -3,6 +3,7 @@ title: Abstract Algebra
 description: >
   Algebraic structures from the ground up: groups, subgroups, quotients, and
   homomorphisms, then rings and fields.
+level: Undergraduate · OSSU core
 sequence_order: 80
 units:
   - title: Groups
@@ -17,6 +18,13 @@ units:
         description: The group axioms; first examples and non-examples.
         est_minutes: 14
         prereqs: [aa-binary-operations, mp-direct-proof]
+        resources:
+          - kind: reading
+            title: Judson — Abstract Algebra, Theory and Applications (free)
+            url: http://abstract.ups.edu/
+          - kind: video
+            title: Socratica — Abstract Algebra
+            url: https://www.youtube.com/@Socratica
       - slug: aa-group-examples
         title: Standard examples of groups
         description: Integers mod n, matrix groups, symmetries.

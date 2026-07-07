@@ -4,6 +4,7 @@ description: >
   The mathematics that machine learning actually uses: matrix calculus and
   decompositions, optimization, probability for models, and the derivations
   behind regression, classification, and backpropagation.
+level: Undergraduate · applied
 sequence_order: 110
 units:
   - title: Linear Algebra for ML
@@ -27,6 +28,9 @@ units:
           - kind: reading
             title: Mathematics for Machine Learning (free book)
             url: https://mml-book.github.io/
+          - kind: reading
+            title: d2l.ai — Preliminaries (linear algebra, calculus, probability)
+            url: https://d2l.ai/chapter_preliminaries/index.html
   - title: Matrix Calculus & Optimization
     topics:
       - slug: ml-gradients-jacobians
@@ -49,6 +53,10 @@ units:
         description: Step sizes, convergence intuition, and variants (momentum, SGD).
         est_minutes: 14
         prereqs: [ml-convexity]
+        resources:
+          - kind: reading
+            title: d2l.ai — Optimization Algorithms
+            url: https://d2l.ai/chapter_optimization/index.html
       - slug: ml-constrained
         title: Constrained optimization and KKT
         description: Lagrangians, duality, and KKT conditions.
@@ -78,6 +86,10 @@ units:
         description: Least squares via calculus and via projections; ridge regularization.
         est_minutes: 16
         prereqs: [ml-matrix-calculus, la-least-squares, ml-mle-map]
+        resources:
+          - kind: reading
+            title: d2l.ai — Linear Neural Networks for Regression
+            url: https://d2l.ai/chapter_linear-regression/index.html
       - slug: ml-logistic-regression
         title: Logistic regression, derived
         description: Sigmoids, cross-entropy loss, and its gradient.
@@ -88,8 +100,44 @@ units:
         description: The chain rule organized over a computation graph.
         est_minutes: 16
         prereqs: [ml-logistic-regression, ml-gradients-jacobians]
+        resources:
+          - kind: video
+            title: 3Blue1Brown — Neural networks
+            url: https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi
+          - kind: reading
+            title: d2l.ai — Forward/backward propagation & computational graphs
+            url: https://d2l.ai/chapter_multilayer-perceptrons/index.html
       - slug: ml-kernels
         title: Kernels and the kernel trick
         description: Feature maps, kernel functions, and kernelized models.
         est_minutes: 14
         prereqs: [ml-constrained, la-orthogonal-sets]
+  - title: Deep Learning
+    topics:
+      - slug: ml-neural-networks
+        title: Neural networks as function composition
+        description: MLPs as chained affine maps and nonlinearities; why depth adds expressiveness.
+        est_minutes: 14
+        prereqs: [ml-backprop]
+        resources:
+          - kind: reading
+            title: d2l.ai — Multilayer Perceptrons
+            url: https://d2l.ai/chapter_multilayer-perceptrons/index.html
+      - slug: ml-softmax
+        title: Softmax and multiclass cross-entropy
+        description: From logits to probabilities; the gradient of softmax cross-entropy.
+        est_minutes: 14
+        prereqs: [ml-logistic-regression]
+        resources:
+          - kind: reading
+            title: d2l.ai — Linear Neural Networks for Classification
+            url: https://d2l.ai/chapter_linear-classification/index.html
+      - slug: ml-attention
+        title: The mathematics of attention
+        description: Queries, keys, and values; attention as differentiable weighted averaging; scaled dot-product form.
+        est_minutes: 16
+        prereqs: [ml-neural-networks, ml-softmax]
+        resources:
+          - kind: reading
+            title: d2l.ai — Attention Mechanisms and Transformers
+            url: https://d2l.ai/chapter_attention-mechanisms-and-transformers/index.html

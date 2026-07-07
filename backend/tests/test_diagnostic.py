@@ -36,7 +36,13 @@ def test_student_knows_everything(seeded_db):
 
 
 def test_partial_knowledge_places_near_boundary(seeded_db):
-    K = 4  # knows everything shallower than depth 4
+    # foundations-i no longer starts at depth 0 (early-math sits beneath it),
+    # so the oracle boundary is relative to the course's shallowest topic.
+    graph0 = TopicGraph.load(seeded_db)
+    base = min(
+        t.depth_rank for t in graph0.topics.values() if t.course.slug == "foundations-i"
+    )
+    K = base + 4  # knows everything shallower than 4 levels into the course
     result = run_diagnostic(seeded_db, lambda t: t.depth_rank < K)
     assert result["questions_asked"] <= diag.MAX_QUESTIONS
 
@@ -53,17 +59,21 @@ def test_partial_knowledge_places_near_boundary(seeded_db):
             f"{graph.topics[tid].slug} (depth {graph.topics[tid].depth_rank}) "
             f"wrongly placed for boundary {K}"
         )
-    # A decent share of genuinely-known topics got credit.
-    known = [t for t in graph.topics.values() if t.depth_rank < K - 1]
+    # A decent share of genuinely-known in-scope topics got credit
+    # (early-math sits outside the diagnostic scope, so exclude it).
+    known = [
+        t for t in graph.topics.values()
+        if t.depth_rank < K - 1 and t.course.slug == "foundations-i"
+    ]
     credited = [t for t in known if t.id in placed]
     assert len(credited) >= len(known) * 0.5
 
-    # The learning frontier lands within ±1 of the boundary.
+    # The in-scope learning frontier lands within ±1 of the boundary.
     masteries = effective_masteries(seeded_db, graph, 1)
     frontier_depths = [
         graph.topics[tid].depth_rank
         for tid, m in masteries.items()
-        if m == "unlocked" and graph.topics[tid].depth_rank > 0
+        if m == "unlocked" and graph.topics[tid].course.slug == "foundations-i"
     ]
     assert frontier_depths, "diagnostic should open a frontier"
     assert min(frontier_depths) >= K - 1

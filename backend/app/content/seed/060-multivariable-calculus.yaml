@@ -4,6 +4,7 @@ description: >
   Calculus in higher dimensions: partial derivatives, gradients, multiple
   integrals, and the vector calculus of line and surface integrals through the
   big theorems of Green, Stokes, and Gauss.
+level: Undergraduate · OSSU core
 sequence_order: 60
 units:
   - title: Space & Surfaces
@@ -62,8 +63,11 @@ units:
         prereqs: [mvc-optimization]
         resources:
           - kind: reading
-            title: MIT OCW 18.02 — Multivariable Calculus
+            title: MIT OCW 18.02 — Multivariable Calculus (OSSU)
             url: https://ocw.mit.edu/courses/18-02sc-multivariable-calculus-fall-2010/
+          - kind: video
+            title: Khan Academy — Multivariable calculus
+            url: https://www.khanacademy.org/math/multivariable-calculus
   - title: Multiple Integrals
     topics:
       - slug: mvc-double-integrals

@@ -3,6 +3,7 @@ title: Mathematical Foundations III
 description: >
   Precalculus and single-variable calculus: trigonometry, complex numbers,
   vectors, limits, derivatives, integrals, and infinite series.
+level: Grades 11–12 · Precalculus & Calculus
 sequence_order: 30
 units:
   - title: Functions, Deeper
@@ -90,6 +91,9 @@ units:
           - kind: reading
             title: Khan Academy — Trigonometry
             url: https://www.khanacademy.org/math/trigonometry
+          - kind: reading
+            title: Khan Academy — Precalculus
+            url: https://www.khanacademy.org/math/precalculus
   - title: Complex Numbers & Vectors
     topics:
       - slug: f3-complex-intro
@@ -114,6 +118,13 @@ units:
         description: Approaching a value; one-sided limits; limits from graphs.
         est_minutes: 12
         prereqs: [f3-rational-functions]
+        resources:
+          - kind: reading
+            title: Khan Academy — Calculus 1
+            url: https://www.khanacademy.org/math/calculus-1
+          - kind: video
+            title: MIT OCW — Calculus 1A/1B/1C (OSSU calculus sequence)
+            url: https://ocw.mit.edu/courses/18-01sc-single-variable-calculus-fall-2010/
       - slug: f3-limit-laws
         title: Limit laws and computation
         description: Evaluating limits algebraically; indeterminate forms.

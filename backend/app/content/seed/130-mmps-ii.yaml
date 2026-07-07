@@ -4,6 +4,7 @@ description: >
   Advanced methods: partial differential equations and boundary value problems,
   special functions, Green's functions, calculus of variations, and complex
   analysis with contour integration.
+level: Advanced undergraduate (physics)
 sequence_order: 130
 units:
   - title: Partial Differential Equations

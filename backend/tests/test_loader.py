@@ -17,9 +17,11 @@ def test_seed_loads(seeded_db):
 
 def test_depth_ranks_assigned(seeded_db):
     db = seeded_db
+    root = db.scalar(select(Topic).where(Topic.slug == "em-counting"))
     place_value = db.scalar(select(Topic).where(Topic.slug == "place-value"))
     two_step = db.scalar(select(Topic).where(Topic.slug == "two-step-equations"))
-    assert place_value.depth_rank == 0
+    assert root.depth_rank == 0
+    assert place_value.depth_rank > root.depth_rank
     assert two_step.depth_rank > place_value.depth_rank
 
 

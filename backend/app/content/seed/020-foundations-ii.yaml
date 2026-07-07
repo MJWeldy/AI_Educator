@@ -4,6 +4,7 @@ description: >
   Algebra in earnest: linear equations and systems, functions, polynomials and
   factoring, quadratics, radicals, rational expressions, exponentials and
   logarithms, and sequences.
+level: Grades 8–11 · Algebra 1 & 2
 sequence_order: 20
 units:
   - title: Linear Equations & Inequalities
@@ -13,6 +14,10 @@ units:
         description: Solving equations requiring distribution and combining like terms.
         est_minutes: 12
         prereqs: [two-step-equations]
+        resources:
+          - kind: reading
+            title: Khan Academy — Algebra 1
+            url: https://www.khanacademy.org/math/algebra
       - slug: f2-variables-both-sides
         title: Equations with variables on both sides
         description: Collecting variable terms; identities and contradictions.
@@ -223,6 +228,13 @@ units:
         description: Growth and decay curves; evaluating and graphing b^x.
         est_minutes: 10
         prereqs: [f2-integer-exponents, f2-function-notation]
+        resources:
+          - kind: reading
+            title: Khan Academy — Algebra 2
+            url: https://www.khanacademy.org/math/algebra2
+          - kind: reading
+            title: Paul's Online Notes — Algebra
+            url: https://tutorial.math.lamar.edu/Classes/Alg/Alg.aspx
       - slug: f2-growth-decay
         title: Exponential growth and decay models
         description: Compound interest, half-life, doubling time.

@@ -23,9 +23,9 @@ def test_first_day_queue_is_frontier_lessons(seeded_db):
     tasks = scheduler.build_today(seeded_db, 1)
     assert tasks, "queue should not be empty"
     assert all(t.type == "lesson" for t in tasks)
-    # The only frontier topic at the start is place-value.
+    # The global root of the curriculum is early-math counting.
     first = seeded_db.get(Topic, tasks[0].topic_ids[0])
-    assert first.slug == "place-value"
+    assert first.slug == "em-counting"
 
 
 def test_queue_idempotent_per_day(seeded_db):

@@ -67,8 +67,11 @@ units:
         prereqs: [la-inverse-matrices]
         resources:
           - kind: video
-            title: MIT 18.06 — Gilbert Strang's Linear Algebra (OSSU)
-            url: https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/
+            title: MIT 18.06SC — Gilbert Strang's Linear Algebra (OCW Scholar, OSSU)
+            url: https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/
+          - kind: video
+            title: Strang — A Vision of Linear Algebra (2020 update)
+            url: https://ocw.mit.edu/courses/res-18-010-a-2020-vision-of-linear-algebra-spring-2020/
           - kind: reading
             title: Khan Academy — Linear algebra
             url: https://www.khanacademy.org/math/linear-algebra
@@ -106,6 +109,10 @@ units:
         description: Column space, null space, row space, left null space; rank.
         est_minutes: 14
         prereqs: [la-basis-dimension]
+        resources:
+          - kind: video
+            title: 18.06SC Unit I — Ax = b and the Four Subspaces
+            url: https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/pages/ax-b-and-the-four-subspaces/
       - slug: la-rank-nullity
         title: Rank-nullity theorem
         description: Dimensions of image and kernel.
@@ -135,6 +142,10 @@ units:
         description: The characteristic equation; eigenspaces.
         est_minutes: 14
         prereqs: [la-determinant-properties, la-independence]
+        resources:
+          - kind: video
+            title: 18.06SC Unit II — Least Squares, Determinants and Eigenvalues
+            url: https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/pages/least-squares-determinants-and-eigenvalues/
       - slug: la-diagonalization
         title: Diagonalization
         description: When A = PDP⁻¹; powers of matrices.
@@ -167,6 +178,10 @@ units:
         description: Orthogonal diagonalization; quadratic forms.
         est_minutes: 14
         prereqs: [la-diagonalization, la-orthogonal-sets]
+        resources:
+          - kind: video
+            title: 18.06SC Unit III — Positive Definite Matrices and Applications
+            url: https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/pages/positive-definite-matrices-and-applications/
       - slug: la-svd
         title: Singular value decomposition
         description: The SVD and what it reveals; low-rank approximation.

@@ -4,7 +4,6 @@ from datetime import datetime, timezone
 from sqlalchemy import (
     JSON,
     Boolean,
-    DateTime,
     Float,
     ForeignKey,
     Integer,
@@ -86,7 +85,7 @@ class Lesson(Base):
     source: Mapped[str] = mapped_column(String, default="seed")  # seed | llm | document
     model: Mapped[str | None] = mapped_column(String, nullable=True)
     review_status: Mapped[str] = mapped_column(String, default="approved")  # draft | approved
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    created_at: Mapped[datetime] = mapped_column(default=utcnow)
 
     topic: Mapped[Topic] = relationship(back_populates="lessons")
 
@@ -105,7 +104,7 @@ class Problem(Base):
     source: Mapped[str] = mapped_column(String, default="seed")  # seed | llm | document
     model: Mapped[str | None] = mapped_column(String, nullable=True)
     review_status: Mapped[str] = mapped_column(String, default="approved")
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    created_at: Mapped[datetime] = mapped_column(default=utcnow)
 
 
 class Resource(Base):
@@ -137,14 +136,12 @@ class UserTopicState(Base):
     # lesson_progress: {tier, correct_streak, misses_at_tier, problems_done, seeds_used}
     lesson_progress: Mapped[dict] = mapped_column(JSON, default=dict)
     fsrs_card: Mapped[dict | None] = mapped_column(JSON, nullable=True)  # py-fsrs Card.to_dict()
-    fsrs_due_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    fsrs_due_at: Mapped[datetime | None] = mapped_column(nullable=True)
     fsrs_stability: Mapped[float | None] = mapped_column(Float, nullable=True)
     reps: Mapped[int] = mapped_column(Integer, default=0)
     lapses: Mapped[int] = mapped_column(Integer, default=0)
     placed_by_diagnostic: Mapped[bool] = mapped_column(Boolean, default=False)
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=utcnow, onupdate=utcnow
-    )
+    updated_at: Mapped[datetime] = mapped_column(default=utcnow, onupdate=utcnow)
 
 
 class Attempt(Base):
@@ -165,7 +162,7 @@ class Attempt(Base):
     hints_used: Mapped[int] = mapped_column(Integer, default=0)
     time_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
     context: Mapped[str] = mapped_column(String, default="lesson")  # lesson|review|quiz|diagnostic
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    created_at: Mapped[datetime] = mapped_column(default=utcnow)
 
 
 class Task(Base):
@@ -180,8 +177,8 @@ class Task(Base):
     payload: Mapped[dict] = mapped_column(JSON, default=dict)
     xp_value: Mapped[int] = mapped_column(Integer, default=0)
     xp_awarded: Mapped[int] = mapped_column(Integer, default=0)
-    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    completed_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    created_at: Mapped[datetime] = mapped_column(default=utcnow)
 
 
 class XpEntry(Base):
@@ -193,7 +190,7 @@ class XpEntry(Base):
     reason: Mapped[str] = mapped_column(String)
     task_id: Mapped[int | None] = mapped_column(ForeignKey("tasks.id"), nullable=True)
     for_date: Mapped[str] = mapped_column(String, index=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    created_at: Mapped[datetime] = mapped_column(default=utcnow)
 
 
 class DiagnosticSession(Base):
@@ -205,7 +202,7 @@ class DiagnosticSession(Base):
     status: Mapped[str] = mapped_column(String, default="active")  # active | finished | abandoned
     belief: Mapped[dict] = mapped_column(JSON, default=dict)  # topic_id(str) -> P(known)
     asked: Mapped[list] = mapped_column(JSON, default=list)  # [{topic_id, correct}]
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    created_at: Mapped[datetime] = mapped_column(default=utcnow)
 
 
 class Document(Base):
@@ -219,7 +216,7 @@ class Document(Base):
     status: Mapped[str] = mapped_column(String, default="uploaded")
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
     page_count: Mapped[int] = mapped_column(Integer, default=0)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    created_at: Mapped[datetime] = mapped_column(default=utcnow)
 
 
 class DocumentSection(Base):
@@ -246,10 +243,8 @@ class Job(Base):
     progress: Mapped[dict] = mapped_column(JSON, default=dict)  # {stage, current, total, message}
     result: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=utcnow, onupdate=utcnow
-    )
+    created_at: Mapped[datetime] = mapped_column(default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(default=utcnow, onupdate=utcnow)
 
 
 class LLMCacheEntry(Base):
@@ -264,7 +259,7 @@ class LLMCacheEntry(Base):
     response: Mapped[str] = mapped_column(Text)
     input_tokens: Mapped[int] = mapped_column(Integer, default=0)
     output_tokens: Mapped[int] = mapped_column(Integer, default=0)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    created_at: Mapped[datetime] = mapped_column(default=utcnow)
 
 
 class SettingRow(Base):

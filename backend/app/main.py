@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
 from . import models  # noqa: F401 — register tables on Base
-from .api import courses, learn, topics
+from .api import courses, learn, stats, tasks, topics
 from .config import settings
 from .content.loader import load_seed
 from .db import Base, SessionLocal, engine
@@ -22,6 +22,8 @@ app = FastAPI(title="Educator", lifespan=lifespan)
 app.include_router(courses.router)
 app.include_router(topics.router)
 app.include_router(learn.router)
+app.include_router(tasks.router)
+app.include_router(stats.router)
 
 
 @app.get("/api/health")

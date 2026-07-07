@@ -1,13 +1,31 @@
 from collections.abc import Iterator
+from datetime import datetime, timezone
 
-from sqlalchemy import create_engine, event
+from sqlalchemy import DateTime, TypeDecorator, create_engine, event
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from .config import DATA_DIR, settings
 
 
+class TZDateTime(TypeDecorator):
+    """SQLite drops timezones; store as UTC and always load UTC-aware."""
+
+    impl = DateTime
+    cache_ok = True
+
+    def process_bind_param(self, value, dialect):
+        if value is not None and value.tzinfo is not None:
+            value = value.astimezone(timezone.utc).replace(tzinfo=None)
+        return value
+
+    def process_result_value(self, value, dialect):
+        if value is not None and value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.utc)
+        return value
+
+
 class Base(DeclarativeBase):
-    pass
+    type_annotation_map = {datetime: TZDateTime}
 
 
 DATA_DIR.mkdir(parents=True, exist_ok=True)

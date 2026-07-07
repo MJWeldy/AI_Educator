@@ -12,6 +12,9 @@ import CoursesPage from './pages/CoursesPage'
 import CourseMapPage from './pages/CourseMapPage'
 import TopicPage from './pages/TopicPage'
 import LearnPage from './pages/LearnPage'
+import TodayPage from './pages/TodayPage'
+import TaskPage from './pages/TaskPage'
+import StatsPage from './pages/StatsPage'
 import Placeholder from './pages/Placeholder'
 
 const queryClient = new QueryClient({
@@ -22,15 +25,8 @@ const router = createBrowserRouter([
   {
     element: <Layout />,
     children: [
-      {
-        path: '/',
-        element: (
-          <Placeholder
-            title="Today"
-            note="Your daily task queue — new lessons, due reviews, and quizzes — arrives in Phase 3."
-          />
-        ),
-      },
+      { path: '/', element: <TodayPage /> },
+      { path: '/task/:taskId', element: <TaskPage /> },
       { path: '/courses', element: <CoursesPage /> },
       { path: '/courses/:slug', element: <CourseMapPage /> },
       { path: '/topics/:topicId', element: <TopicPage /> },
@@ -44,12 +40,7 @@ const router = createBrowserRouter([
           />
         ),
       },
-      {
-        path: '/stats',
-        element: (
-          <Placeholder title="Stats" note="XP history, streaks, and mastery over time. Arrives in Phase 3." />
-        ),
-      },
+      { path: '/stats', element: <StatsPage /> },
       {
         path: '/settings',
         element: (

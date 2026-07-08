@@ -671,3 +671,13 @@ button {
 }
 
 .btn.danger { color: var(--accent); border-color: var(--accent); box-shadow: 3px 3px 0 rgba(156, 47, 34, 0.2); }
+
+/* Wide display equations scroll within their container instead of overflowing. */
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+  padding: 4px 2px;
+}
+.katex-display::-webkit-scrollbar { height: 6px; }
+.katex-display::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }

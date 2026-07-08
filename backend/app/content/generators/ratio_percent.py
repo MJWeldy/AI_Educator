@@ -35,9 +35,9 @@ def unit_rate(rng: random.Random, difficulty: int) -> ProblemInstance:
     unit_price = Decimal(rng.randint(50, 599)) / 100
     total = unit_price * qty
     return ProblemInstance(
-        statement_md=f"A pack of ${qty}$ notebooks costs $\\${total}$.",
+        statement_md=f"A pack of ${qty}$ notebooks costs \\${total}.",
         parts=[numeric("What is the price per notebook, in dollars?", unit_price)],
-        solution_md=f"$\\${total} \\div {qty} = \\${unit_price}$ per notebook.",
+        solution_md=f"\\${total} divided by ${qty}$ notebooks is \\${unit_price} per notebook.",
     )
 
 
@@ -109,7 +109,7 @@ def percent_change(rng: random.Random, difficulty: int) -> ProblemInstance:
     new = old + change if increase else old - change
     word = "increased" if increase else "decreased"
     return ProblemInstance(
-        statement_md=f"A price {word} from $\\${old}$ to $\\${new}$.",
+        statement_md=f"A price {word} from \\${old} to \\${new}.",
         parts=[numeric("What was the percent change, in percent?", p)],
         solution_md=(
             f"$\\text{{change}} = \\lvert {new} - {old} \\rvert = {change}$; "

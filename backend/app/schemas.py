@@ -33,6 +33,7 @@ class CourseSummary(BaseModel):
     title: str
     description: str
     level: str = ""
+    document_id: int | None = None
     sequence_order: int
     source: str
     topic_count: int

@@ -9,7 +9,8 @@ import 'katex/dist/katex.min.css'
  * `$` delimiter would escape it in markdown and swallow the following prose. */
 function normalizeMath(md: string): string {
   return md
-    .replace(/(?<!\\)\\\[([\s\S]*?)(?<!\\)\\\]/g, (_, body) => `$$${body.replace(/\\+\s*$/, '')}$$`)
+    // Display fences must sit on their own lines for remark-math.
+    .replace(/(?<!\\)\\\[([\s\S]*?)(?<!\\)\\\]/g, (_, body) => `\n$$\n${body.replace(/\\+\s*$/, '')}\n$$\n`)
     .replace(/(?<!\\)\\\(([\s\S]*?)(?<!\\)\\\)/g, (_, body) => `$${body.replace(/\\+\s*$/, '')}$`)
 }
 

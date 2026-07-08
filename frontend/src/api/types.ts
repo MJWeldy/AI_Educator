@@ -32,6 +32,7 @@ export interface CourseSummary {
   title: string
   description: string
   level: string
+  document_id: number | null
   sequence_order: number
   source: string
   topic_count: number

@@ -1,44 +1,24 @@
-"""Collect every LaTeX fragment the app can display into a JSON file, so
-frontend/scripts/check-katex.mjs can compile each one with the real KaTeX.
+"""Export every displayable markdown document to JSON so
+frontend/scripts/check-katex.mjs can validate it with the app's real
+markdown+KaTeX pipeline.
 
-Sources: seed YAML lessons/examples, every problem generator (all difficulties,
-many seeds), and — when the real database exists — all stored lessons and
-problems (i.e. AI-generated and ingested-book content).
+Sources: seed YAML lessons/examples/descriptions, every problem generator
+(all difficulties, many seeds), and — when the real database exists — all
+stored lessons and problems (AI-generated and ingested-book content).
 
 Usage: ../.venv/bin/python scripts/export_latex.py [out.json] (from backend/)
 """
 
 import json
-import re
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-MATH_DISPLAY = re.compile(r"\$\$(.+?)\$\$", re.DOTALL)
-# Inline math: delimiters are unescaped $; \$ inside stays part of the content.
-MATH_INLINE = re.compile(r"(?<!\\)\$((?:\\.|[^$\\])+?)\$")
-PAREN_BLOCK = re.compile(r"(?<!\\)\\\[([\s\S]*?)(?<!\\)\\\]")
-PAREN_INLINE = re.compile(r"(?<!\\)\\\(([\s\S]*?)(?<!\\)\\\)")
 
-
-def normalize(md: str) -> str:
-    """Same delimiter normalization the frontend Markdown component applies."""
-    strip = lambda body: re.sub(r"\\+\s*$", "", body)  # noqa: E731
-    md = PAREN_BLOCK.sub(lambda m: f"$${strip(m.group(1))}$$", md)
-    return PAREN_INLINE.sub(lambda m: f"${strip(m.group(1))}$", md)
-
-
-def fragments(md: str, source: str, out: list, display_hint: bool = False) -> None:
-    if not md:
-        return
-    md = normalize(str(md))
-    rest = MATH_DISPLAY.sub(
-        lambda m: out.append({"source": source, "math": m.group(1), "display": True}) or " ",
-        md,
-    )
-    for m in MATH_INLINE.finditer(rest):
-        out.append({"source": source, "math": m.group(1), "display": False})
+def add(out: list, source: str, md) -> None:
+    if md and isinstance(md, str) and md.strip():
+        out.append({"source": source, "md": md})
 
 
 def collect_generators(out: list, seeds: int = 40) -> None:
@@ -49,12 +29,12 @@ def collect_generators(out: list, seeds: int = 40) -> None:
             for seed in range(1, seeds + 1):
                 inst = make_instance(key, seed, difficulty)
                 src = f"generator:{key} d{difficulty} s{seed}"
-                fragments(inst.statement_md, src, out)
-                fragments(inst.solution_md, src, out)
+                add(out, src, inst.statement_md)
+                add(out, src, inst.solution_md)
                 for p in inst.parts:
-                    fragments(p.prompt_md, src, out)
+                    add(out, src, p.prompt_md)
                     for choice in p.choices or []:
-                        fragments(choice, src, out)
+                        add(out, src, choice)
 
 
 def collect_seed(out: list) -> None:
@@ -67,11 +47,11 @@ def collect_seed(out: list) -> None:
         for unit in doc.get("units", []):
             for t in unit.get("topics", []):
                 src = f"seed:{t['slug']}"
-                fragments(t.get("lesson", ""), src, out)
-                fragments(t.get("description", ""), src, out)
+                add(out, src, t.get("lesson", ""))
+                add(out, src, t.get("description", ""))
                 for ex in t.get("worked_examples", []):
-                    fragments(ex.get("problem", ""), src, out)
-                    fragments(ex.get("solution", ""), src, out)
+                    add(out, src, ex.get("problem", ""))
+                    add(out, src, ex.get("solution", ""))
 
 
 def collect_db(out: list) -> None:
@@ -86,18 +66,18 @@ def collect_db(out: list) -> None:
     with SessionLocal() as db:
         for lesson in db.scalars(select(Lesson)):
             src = f"db:lesson:{lesson.id}"
-            fragments(lesson.content_md, src, out)
+            add(out, src, lesson.content_md)
             for ex in lesson.worked_examples or []:
-                fragments(ex.get("problem_md", ""), src, out)
-                fragments(ex.get("solution_md", ""), src, out)
+                add(out, src, ex.get("problem_md", ""))
+                add(out, src, ex.get("solution_md", ""))
         for problem in db.scalars(select(Problem)):
             src = f"db:problem:{problem.id}"
-            fragments(problem.statement_md, src, out)
-            fragments(problem.solution_md, src, out)
+            add(out, src, problem.statement_md)
+            add(out, src, problem.solution_md)
             for part in problem.parts or []:
-                fragments(part.get("prompt_md", ""), src, out)
+                add(out, src, part.get("prompt_md", ""))
                 for choice in part.get("choices") or []:
-                    fragments(choice, src, out)
+                    add(out, src, choice)
 
 
 def main() -> None:
@@ -107,7 +87,7 @@ def main() -> None:
     collect_db(out)
     dest = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("/tmp/educator-latex.json")
     dest.write_text(json.dumps(out))
-    print(f"collected {len(out)} math fragments -> {dest}")
+    print(f"collected {len(out)} markdown documents -> {dest}")
 
 
 if __name__ == "__main__":

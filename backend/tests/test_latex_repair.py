@@ -36,3 +36,14 @@ def test_repairs_katex_incompatibilities():
     assert repair(r"\bigl\{\bigr\}") == r"\bigl\{\bigr\}"
     assert repair(r"\Bigl|x\Bigr|") == r"\Bigl|x\Bigr|"
     assert repair(r"\bigl\lvert x \bigr\rvert") == r"\bigl\lvert x \bigr\rvert"
+
+
+def test_display_fences_get_own_lines():
+    assert repair("$$\\begin{aligned}\nx &= 1\n\\end{aligned}$$") == (
+        "$$\n\\begin{aligned}\nx &= 1\n\\end{aligned}\n$$"
+    )
+    assert repair("so\n$$x^2$$\nyes") == "so\n$$\nx^2\n$$\nyes"
+    # table rows are left alone
+    assert repair("| a | $$x$$ |") == "| a | $$x$$ |"
+    # already-clean fences unchanged
+    assert repair("$$\nx+1\n$$") == "$$\nx+1\n$$"

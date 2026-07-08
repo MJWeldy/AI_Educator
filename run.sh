@@ -16,7 +16,7 @@ fi
 if [ "$HOST" = "0.0.0.0" ]; then
   IP=$(hostname -I 2>/dev/null | awk '{print $1}')
   echo
-  echo "Serving on your network — other devices can open:  http://${IP:-<this-machine's-IP>}:8700"
+  echo "Serving on your network — other devices can open:  http://${IP:-<machine-ip>}:8700"
   echo "(anyone on the network can use the app and switch profiles — home networks only)"
   echo
 fi

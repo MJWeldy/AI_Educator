@@ -239,6 +239,10 @@ async def test_delete_document_removes_everything(seeded_db, doc, monkeypatch):
     app.dependency_overrides[get_db] = override_db
     try:
         with TestClient(app) as client:
+            # Uploaded courses can be renamed (and the document title follows).
+            res = client.patch(f"/api/courses/{course.slug}", json={"title": "My Paper"})
+            assert res.status_code == 200 and res.json()["title"] == "My Paper"
+            assert seeded_db.get(Document, doc.id).title == "My Paper"
             assert client.delete(f"/api/documents/{doc.id}").status_code == 200
     finally:
         app.dependency_overrides.clear()

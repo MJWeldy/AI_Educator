@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -93,3 +94,33 @@ def get_course(
         **summary,
         units=[UnitOut(title=name, topics=nodes) for name, nodes in units.items()],
     )
+
+
+class CourseRename(BaseModel):
+    title: str
+
+
+@router.patch("/{slug}", response_model=CourseSummary)
+def rename_course(slug: str, body: CourseRename, db: Session = Depends(get_db)):
+    """Rename an uploaded course. Seed courses are managed by the curriculum
+    files and re-sync their titles at startup, so renaming them wouldn't stick."""
+    course = db.scalar(select(Course).where(Course.slug == slug))
+    if course is None:
+        raise HTTPException(404, "course not found")
+    if course.source != "document":
+        raise HTTPException(409, "built-in courses are renamed in the curriculum files")
+    title = body.title.strip()
+    if not title:
+        raise HTTPException(400, "title required")
+    course.title = title[:120]
+    if course.document_id is not None:
+        from ..models import Document
+
+        doc = db.get(Document, course.document_id)
+        if doc is not None:
+            doc.title = course.title
+    db.commit()
+    graph = TopicGraph.load(db)
+    masteries = effective_masteries(db, graph, 1)
+    topics = [t for t in graph.topics.values() if t.course_id == course.id]
+    return CourseSummary(**_summarize(course, masteries, topics))

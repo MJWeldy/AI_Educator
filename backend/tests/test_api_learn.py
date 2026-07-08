@@ -109,3 +109,8 @@ def test_expression_preview(client):
     assert out["ok"] and "frac" in out["latex"]
     bad = client.get("/api/learn/preview/expression", params={"expr": "import os"}).json()
     assert not bad["ok"]
+
+
+def test_rename_guards_builtin_courses(client):
+    res = client.patch("/api/courses/foundations-i", json={"title": "My Custom Name"})
+    assert res.status_code == 409

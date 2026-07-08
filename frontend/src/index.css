@@ -681,3 +681,14 @@ button {
 }
 .katex-display::-webkit-scrollbar { height: 6px; }
 .katex-display::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 6px;
+  margin: 6px 0 18px;
+}
+.section-head h2 { font-size: 21px; }
+.section-head .mono { font-size: 11.5px; }

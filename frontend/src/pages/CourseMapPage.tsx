@@ -20,6 +20,17 @@ export default function CourseMapPage() {
     queryFn: () => api<CourseDetail>(`/api/courses/${slug}`),
   })
 
+  const renameCourse = async () => {
+    if (!course) return
+    const title = window.prompt('New course name:', course.title)
+    if (!title || title.trim() === '' || title === course.title) return
+    await api(`/api/courses/${course.slug}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ title: title.trim() }),
+    })
+    queryClient.invalidateQueries()
+  }
+
   const deleteCourse = async () => {
     if (!course?.document_id) return
     if (
@@ -42,7 +53,10 @@ export default function CourseMapPage() {
       <h1 className="page-title rise rise-1">{course.title}</h1>
       <p className="page-sub rise rise-2">{course.description}</p>
       {course.document_id != null && (
-        <div className="rise rise-2" style={{ margin: '-16px 0 26px' }}>
+        <div className="rise rise-2" style={{ margin: '-16px 0 26px', display: 'flex', gap: 10 }}>
+          <button className="btn secondary" style={{ padding: '6px 14px', fontSize: 12 }} onClick={renameCourse}>
+            Rename
+          </button>
           <button className="btn secondary danger" style={{ padding: '6px 14px', fontSize: 12 }} onClick={deleteCourse}>
             Delete this course
           </button>

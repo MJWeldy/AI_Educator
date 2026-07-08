@@ -118,11 +118,16 @@ async def generate_content(db: Session, doc: Document, progress=None) -> None:
                 ],
                 LESSON_SCHEMA,
             )
+            examples = [
+                ex
+                for ex in (result.get("worked_examples") or [])
+                if isinstance(ex, dict) and ex.get("problem_md") and ex.get("solution_md")
+            ]
             db.add(
                 Lesson(
                     topic_id=topic.id,
-                    content_md=result["content_md"],
-                    worked_examples=result.get("worked_examples", []),
+                    content_md=str(result.get("content_md") or ""),
+                    worked_examples=examples,
                     source="document",
                     model=f"{choice.provider_name}:{choice.model}",
                     review_status="draft",
@@ -148,16 +153,29 @@ async def generate_content(db: Session, doc: Document, progress=None) -> None:
                 PROBLEMS_SCHEMA,
             )
             for pdoc in result.get("problems", []):
-                parts = pdoc.get("parts", [])
-                verified = verify_problem(parts)
+                # Local models sometimes emit malformed entries (a bare string,
+                # missing parts, non-list parts). Skip them rather than crash
+                # the whole book's ingestion.
+                if not isinstance(pdoc, dict) or not pdoc.get("statement_md"):
+                    continue
+                parts = pdoc.get("parts")
+                if not isinstance(parts, list):
+                    continue
+                parts = [p for p in parts if isinstance(p, dict) and p.get("canonical") is not None]
+                if not parts:
+                    continue
+                try:
+                    difficulty = max(1, min(3, int(pdoc.get("difficulty", 1))))
+                except (TypeError, ValueError):
+                    difficulty = 1
                 db.add(
                     Problem(
                         topic_id=topic.id,
-                        statement_md=pdoc["statement_md"],
+                        statement_md=str(pdoc["statement_md"]),
                         parts=parts,
-                        solution_md=pdoc.get("solution_md", ""),
-                        difficulty=max(1, min(3, int(pdoc.get("difficulty", 1)))),
-                        answer_verified=verified,
+                        solution_md=str(pdoc.get("solution_md", "")),
+                        difficulty=difficulty,
+                        answer_verified=verify_problem(parts),
                         source="document",
                         model=f"{choice.provider_name}:{choice.model}",
                         review_status="draft",

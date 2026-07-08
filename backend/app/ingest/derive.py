@@ -148,18 +148,24 @@ async def derive_topics(db: Session, doc: Document, progress=None) -> Course:
                 TOPICS_SCHEMA,
             )
             for tdoc in result.get("topics", []):
-                slug = f"doc{doc.id}-{slugify(tdoc['title'])}"
+                if not isinstance(tdoc, dict) or not tdoc.get("title"):
+                    continue
+                slug = f"doc{doc.id}-{slugify(str(tdoc['title']))}"
                 base, i = slug, 2
                 while db.scalar(select(Topic).where(Topic.slug == slug)) is not None:
                     slug = f"{base}-{i}"
                     i += 1
+                try:
+                    est = max(5, min(20, int(tdoc.get("est_minutes", 10))))
+                except (TypeError, ValueError):
+                    est = 10
                 topic = Topic(
                     slug=slug,
                     course_id=course.id,
                     unit=chapter.title[:120],
-                    title=tdoc["title"][:200],
-                    description=tdoc.get("description", "")[:500],
-                    est_minutes=max(5, min(20, int(tdoc.get("est_minutes", 10)))),
+                    title=str(tdoc["title"])[:200],
+                    description=str(tdoc.get("description", ""))[:500],
+                    est_minutes=est,
                     source="document",
                     document_section_id=section.id,
                     status="draft",
@@ -207,17 +213,19 @@ async def _derive_edges(db: Session, doc: Document, chapter, topics: list[Topic]
     cand_by_slug = {t.slug: t for t in candidates}
     seen: set[tuple[int, int]] = set()
     for edge in result.get("edges", []):
+        if not isinstance(edge, dict):
+            continue
         ti = edge.get("topic", -1)
-        if not (0 <= ti < len(topics)):
+        if not (isinstance(ti, int) and 0 <= ti < len(topics)):
             continue
         dependent = topics[ti]
-        for ri in edge.get("requires", []):
-            if 0 <= ri < len(topics) and ri != ti:
+        for ri in edge.get("requires") or []:
+            if isinstance(ri, int) and 0 <= ri < len(topics) and ri != ti:
                 key = (topics[ri].id, dependent.id)
                 if key not in seen:
                     seen.add(key)
                     db.add(TopicEdge(prereq_id=key[0], topic_id=key[1], kind="hard", source="document"))
-        for slug in edge.get("requires_seed", []):
+        for slug in edge.get("requires_seed") or []:
             seed_topic = cand_by_slug.get(slug)
             if seed_topic is not None:
                 key = (seed_topic.id, dependent.id)

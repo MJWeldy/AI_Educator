@@ -252,3 +252,58 @@ async def test_delete_document_removes_everything(seeded_db, doc, monkeypatch):
     assert seeded_db.scalars(select(DocumentSection).where(DocumentSection.document_id == doc.id)).all() == []
     assert seeded_db.get(Document, doc.id) is None
     assert seeded_db.scalars(select(UserTopicState).where(UserTopicState.topic_id == topic.id)).all() == []
+
+
+async def test_generate_tolerates_malformed_llm_output(seeded_db, doc, monkeypatch):
+    """A local model can emit a bare string, missing parts, or bad difficulty
+    inside the problems/topics lists — ingestion must skip them, not crash."""
+    from app.ingest import derive, generate
+
+    topics_payload = {"topics": [
+        {"title": "Good Topic", "description": "d", "est_minutes": 10},
+        "a bare string instead of an object",       # malformed
+        {"description": "no title", "est_minutes": 5},  # missing title
+        {"title": "Bad Minutes", "est_minutes": "lots"},  # bad est_minutes
+    ]}
+    edges_payload = {"edges": ["nonsense", {"topic": 0, "requires": [None], "requires_seed": []}]}
+    lesson_payload = {"content_md": "ok", "worked_examples": [
+        {"problem_md": "p", "solution_md": "s"}, "bad", {"problem_md": "only prompt"},
+    ]}
+    problems_payload = {"problems": [
+        {"statement_md": "Q1", "parts": [{"prompt_md": "x", "answer_type": "numeric", "canonical": "2"}],
+         "solution_md": "", "difficulty": 1},
+        "a bare string",                              # the crash from the field report
+        {"statement_md": "no parts"},                 # missing parts
+        {"statement_md": "Q4", "parts": "not a list"},  # parts wrong type
+        {"statement_md": "Q5", "parts": [{"prompt_md": "x", "answer_type": "numeric"}]},  # no canonical
+    ]}
+
+    async def fake_cached(db_, choice, job_type, messages, schema, max_tokens=4096):
+        from app.llm.base import JobType
+        return {JobType.ingest_topics: topics_payload, JobType.topic_mapping: edges_payload,
+                JobType.ingest_lesson: lesson_payload, JobType.ingest_problems: problems_payload}[job_type]
+
+    class FakeChoice:
+        provider_name = model = "fake"
+
+    monkeypatch.setattr(derive, "cached_complete_json", fake_cached)
+    monkeypatch.setattr(generate, "cached_complete_json", fake_cached)
+    monkeypatch.setattr(derive.router, "resolve", lambda d, j: FakeChoice())
+    monkeypatch.setattr(generate.router, "resolve", lambda d, j: FakeChoice())
+
+    extracted = extract.extract(doc)
+    segment.build_sections(seeded_db, doc, extracted)
+    course = await derive.derive_topics(seeded_db, doc)   # must not raise
+    await generate.generate_content(seeded_db, doc)       # must not raise
+
+    topics = seeded_db.scalars(select(Topic).where(Topic.course_id == course.id)).all()
+    titles = {t.title for t in topics}
+    assert "Good Topic" in titles and "Bad Minutes" in titles
+    assert not any(t.title == "no title" for t in topics)
+
+    good = seeded_db.scalar(select(Topic).where(Topic.title == "Good Topic"))
+    problems = seeded_db.scalars(select(Problem).where(Problem.topic_id == good.id)).all()
+    # Only the one well-formed problem survives the filter.
+    assert len(problems) == 1 and problems[0].statement_md == "Q1"
+    lesson = seeded_db.scalar(select(Lesson).where(Lesson.topic_id == good.id))
+    assert len(lesson.worked_examples) == 1  # the two malformed examples dropped

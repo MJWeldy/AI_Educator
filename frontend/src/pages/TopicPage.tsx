@@ -77,12 +77,16 @@ export default function TopicPage() {
         <section className="rise rise-4" style={{ marginTop: 34 }}>
           <h3>Further material</h3>
           <ul className="resource-list">
-            {topic.resources.map((r) => (
-              <li key={r.url}>
+            {topic.resources.map((r, i) => (
+              <li key={`${r.kind}-${r.url}-${i}`}>
                 <span className="kind">{r.kind}</span>
-                <a href={r.url} target="_blank" rel="noreferrer">
-                  {r.title}
-                </a>
+                {r.url ? (
+                  <a href={r.url} target="_blank" rel="noreferrer">
+                    {r.title}
+                  </a>
+                ) : (
+                  <span>{r.title}</span>
+                )}
                 {r.note && <span className="muted"> — {r.note}</span>}
               </li>
             ))}

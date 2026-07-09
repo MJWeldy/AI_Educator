@@ -5,7 +5,15 @@ from sqlalchemy import select
 from app.engine import scheduler
 from app.engine.mastery import get_or_create_state
 from app.engine.srs import init_card
-from app.models import Mastery, Task, Topic, UserTopicState
+from app.models import Course, Enrollment, Mastery, Task, Topic, UserTopicState
+
+
+def enroll_all(db, profile_id: int = 1):
+    """New lessons only surface for enrolled courses; enroll the profile in all."""
+    for cid in db.scalars(select(Course.id)):
+        if db.get(Enrollment, (profile_id, cid)) is None:
+            db.add(Enrollment(profile_id=profile_id, course_id=cid))
+    db.flush()
 
 
 def learn_topic(db, slug: str, due_days_ago: float | None = None):
@@ -20,12 +28,19 @@ def learn_topic(db, slug: str, due_days_ago: float | None = None):
 
 
 def test_first_day_queue_is_frontier_lessons(seeded_db):
+    enroll_all(seeded_db)
     tasks = scheduler.build_today(seeded_db, 1)
     assert tasks, "queue should not be empty"
     assert all(t.type == "lesson" for t in tasks)
     # The global root of the curriculum is early-math counting.
     first = seeded_db.get(Topic, tasks[0].topic_ids[0])
     assert first.slug == "em-counting"
+
+
+def test_no_lessons_without_enrollment(seeded_db):
+    # Without enrolling in any course, Today has no new lessons to offer.
+    tasks = scheduler.build_today(seeded_db, 1)
+    assert all(t.type != "lesson" for t in tasks)
 
 
 def test_queue_idempotent_per_day(seeded_db):
@@ -67,6 +82,7 @@ def test_quiz_triggers_with_enough_learned_topics(seeded_db):
 
 
 def test_lessons_fill_to_goal(seeded_db):
+    enroll_all(seeded_db)
     tasks = scheduler.build_today(seeded_db, 1)
     lesson_xp = sum(t.xp_value for t in tasks if t.type == "lesson")
     # The frontier only has one topic at the very start, so the queue may be

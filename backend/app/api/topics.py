@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from ..content.worked_examples import normalize_worked_examples
 from ..db import get_db
 from .deps import current_profile_id
 from ..engine.graph import TopicGraph, effective_masteries
@@ -32,7 +33,7 @@ def get_topic(
     if lesson is not None:
         lesson_out = LessonOut(
             content_md=lesson.content_md,
-            worked_examples=[WorkedExample(**ex) for ex in lesson.worked_examples],
+            worked_examples=[WorkedExample(**ex) for ex in normalize_worked_examples(lesson.worked_examples)],
             source=lesson.source,
         )
 

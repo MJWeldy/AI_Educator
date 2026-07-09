@@ -133,4 +133,40 @@ def finish(db: Session, session: DiagnosticSession, graph: TopicGraph) -> dict:
 
     session.status = "finished"
     db.commit()
-    return {"placed_mastered": placed, "questions_asked": len(session.asked)}
+
+    # A wholly-missed placement means the learner lacks the prerequisites for
+    # this course; point them at earlier material to start with.
+    asked = list(session.asked)
+    failed = bool(asked) and all(not a["correct"] for a in asked)
+    suggested = _earlier_courses(session, graph) if failed else []
+    return {
+        "placed_mastered": placed,
+        "questions_asked": len(asked),
+        "failed_placement": failed,
+        "suggested_earlier": suggested,
+    }
+
+
+def _earlier_courses(session: DiagnosticSession, graph: TopicGraph) -> list[dict]:
+    """Courses to study before the placed-into one: those holding prerequisites
+    of the scoped topics, else any course earlier in the curriculum sequence."""
+    scope = set(session.course_scope)
+    scoped_tids = [int(t) for t in session.belief if int(t) in graph.topics]
+
+    prereq: dict[str, tuple[int, str]] = {}
+    for tid in scoped_tids:
+        for pid in graph.all_prereqs(tid):
+            course = graph.topics[pid].course
+            if course.slug not in scope:
+                prereq[course.slug] = (course.sequence_order, course.title)
+    if not prereq:
+        scoped_order = min(
+            (graph.topics[tid].course.sequence_order for tid in scoped_tids), default=0
+        )
+        for t in graph.topics.values():
+            course = t.course
+            if course.slug not in scope and course.sequence_order < scoped_order:
+                prereq[course.slug] = (course.sequence_order, course.title)
+
+    ordered = sorted(prereq.items(), key=lambda kv: kv[1][0], reverse=True)  # nearest first
+    return [{"slug": slug, "title": title} for slug, (_seq, title) in ordered[:3]]

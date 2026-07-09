@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from ..content import llm_content
+from ..content.worked_examples import normalize_worked_examples
 from ..db import get_db
 from ..llm.base import LLMError
 from ..llm.ollama import OllamaProvider
@@ -52,7 +53,7 @@ async def generate_lesson(topic_id: int, db: Session = Depends(get_db)):
         raise HTTPException(502, str(e))
     return LessonOut(
         content_md=lesson.content_md,
-        worked_examples=[WorkedExample(**ex) for ex in lesson.worked_examples],
+        worked_examples=[WorkedExample(**ex) for ex in normalize_worked_examples(lesson.worked_examples)],
         source=lesson.source,
     )
 

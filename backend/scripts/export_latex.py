@@ -58,6 +58,7 @@ def collect_db(out: list) -> None:
     from sqlalchemy import select
 
     from app.config import DATA_DIR
+    from app.content.worked_examples import normalize_worked_examples
     from app.db import SessionLocal
     from app.models import Lesson, Problem
 
@@ -67,7 +68,7 @@ def collect_db(out: list) -> None:
         for lesson in db.scalars(select(Lesson)):
             src = f"db:lesson:{lesson.id}"
             add(out, src, lesson.content_md)
-            for ex in lesson.worked_examples or []:
+            for ex in normalize_worked_examples(lesson.worked_examples):
                 add(out, src, ex.get("problem_md", ""))
                 add(out, src, ex.get("solution_md", ""))
         for problem in db.scalars(select(Problem)):

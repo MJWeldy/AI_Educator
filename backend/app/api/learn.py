@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from ..content import checking
 from ..content.serving import pick_problem, resolve_submission
+from ..content.worked_examples import normalize_worked_examples
 from ..db import get_db
 from .deps import current_profile_id
 from ..engine import xp
@@ -82,7 +83,7 @@ def _lesson_out(db: Session, topic_id: int) -> LessonOut | None:
         return None
     return LessonOut(
         content_md=lesson.content_md,
-        worked_examples=[WorkedExample(**ex) for ex in lesson.worked_examples],
+        worked_examples=[WorkedExample(**ex) for ex in normalize_worked_examples(lesson.worked_examples)],
         source=lesson.source,
     )
 

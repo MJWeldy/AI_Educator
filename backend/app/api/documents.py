@@ -1,15 +1,19 @@
 import shutil
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .. import jobs
 from ..config import settings
+from ..content.worked_examples import normalize_worked_examples
 from ..db import get_db
-from ..models import Course, Document, DocumentSection, Job, Lesson, Problem, Topic, TopicEdge
+from ..ingest.extract import kind_for
+from ..models import (
+    Course, Document, DocumentFile, DocumentSection, Job, Lesson, Problem, Resource, Topic, TopicEdge,
+)
 
 router = APIRouter(prefix="/api/documents", tags=["documents"])
 
@@ -60,18 +64,33 @@ def list_documents(db: Session = Depends(get_db)):
 
 
 @router.post("", response_model=DocumentOut)
-async def upload(file: UploadFile, db: Session = Depends(get_db)):
-    if not (file.filename or "").lower().endswith(".pdf"):
-        raise HTTPException(400, "only PDF files are supported")
-    uploads = Path(settings.uploads_dir)
-    uploads.mkdir(parents=True, exist_ok=True)
-    doc = Document(filename=file.filename, stored_path="")
+async def upload(files: list[UploadFile] = File(...), db: Session = Depends(get_db)):
+    """Ingest one PDF, or a whole folder of PDF/text/markdown/code files, into a
+    single course. Unsupported files in a folder are skipped."""
+    accepted = [(f, k) for f in files if (k := kind_for(f.filename or "")) is not None]
+    if not accepted:
+        raise HTTPException(400, "upload a PDF, or a folder of PDF/text/markdown/code files")
+
+    # A human label for the batch: the file name for one file, else the folder.
+    if len(accepted) == 1:
+        label = Path(accepted[0][0].filename or "upload").name
+    else:
+        first = accepted[0][0].filename or ""
+        label = (first.split("/", 1)[0] if "/" in first else "") or f"{len(accepted)} files"
+
+    doc = Document(filename=label, stored_path="")
     db.add(doc)
     db.flush()
-    dest = uploads / f"{doc.id}-{Path(file.filename).name}"
-    with dest.open("wb") as f:
-        shutil.copyfileobj(file.file, f)
-    doc.stored_path = str(dest)
+    base = Path(settings.uploads_dir) / str(doc.id)
+    base.mkdir(parents=True, exist_ok=True)
+    for pos, (f, kind) in enumerate(accepted):
+        rel = f.filename or f"file-{pos}"
+        dest = base / f"{pos}-{Path(rel).name}"
+        with dest.open("wb") as out:
+            shutil.copyfileobj(f.file, out)
+        db.add(DocumentFile(
+            document_id=doc.id, filename=rel, stored_path=str(dest), position=pos, kind=kind
+        ))
     db.commit()
     jobs.enqueue(db, "ingest_document", {"document_id": doc.id})
     return _doc_out(db, doc)
@@ -101,6 +120,7 @@ class ReviewTopic(BaseModel):
     description: str
     est_minutes: int
     prereq_titles: list[str]
+    readings: list[str]
     lesson_md: str | None
     worked_examples: list[dict]
     problems: list[ReviewProblem]
@@ -131,6 +151,9 @@ def review(doc_id: int, db: Session = Depends(get_db)):
             prereq_ids = db.scalars(
                 select(TopicEdge.prereq_id).where(TopicEdge.topic_id == t.id)
             ).all()
+            reading_rows = db.scalars(
+                select(Resource).where(Resource.topic_id == t.id, Resource.kind == "reading")
+            ).all()
             topics.append(
                 ReviewTopic(
                     id=t.id,
@@ -139,8 +162,9 @@ def review(doc_id: int, db: Session = Depends(get_db)):
                     description=t.description,
                     est_minutes=t.est_minutes,
                     prereq_titles=[titles.get(p, "?") for p in prereq_ids],
+                    readings=[f"{r.title} — {r.note}" if r.note else r.title for r in reading_rows],
                     lesson_md=lesson.content_md if lesson else None,
-                    worked_examples=lesson.worked_examples if lesson else [],
+                    worked_examples=normalize_worked_examples(lesson.worked_examples) if lesson else [],
                     problems=[
                         ReviewProblem(
                             id=p.id,
@@ -208,11 +232,18 @@ def delete_document(doc_id: int, db: Session = Depends(get_db)):
     db.flush()
     for section in (s for s in sections if s.parent_id is None):
         db.delete(section)
-    stored = Path(doc.stored_path) if doc.stored_path else None
-    db.delete(doc)
+    # Files to remove after the row is gone: legacy single-file path, per-file
+    # paths, and the per-document upload directory (folder uploads).
+    stored_paths = [Path(doc.stored_path)] if doc.stored_path else []
+    stored_paths += [Path(f.stored_path) for f in doc.files]
+    upload_dir = Path(settings.uploads_dir) / str(doc.id)
+    db.delete(doc)  # cascades to DocumentFile rows
     db.commit()
-    if stored and stored.exists():
-        stored.unlink()
+    for p in stored_paths:
+        if p.exists():
+            p.unlink()
+    if upload_dir.is_dir():
+        shutil.rmtree(upload_dir, ignore_errors=True)
     return {"ok": True}
 
 

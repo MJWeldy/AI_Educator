@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { api } from '../api/client'
 import type { CourseSummary } from '../api/types'
 import ProblemCard, { type PartResult, type ProblemPublic } from '../components/ProblemCard'
@@ -21,35 +21,50 @@ interface SessionOut {
 interface FinishOut {
   placed_mastered: number
   questions_asked: number
+  failed_placement: boolean
+  suggested_earlier: { slug: string; title: string }[]
 }
 
 export default function DiagnosticPage() {
   const queryClient = useQueryClient()
+  const [searchParams] = useSearchParams()
+  const courseParam = searchParams.get('course')
   const { data: courses } = useQuery({
     queryKey: ['courses'],
     queryFn: () => api<CourseSummary[]>('/api/courses'),
   })
-  const [selected, setSelected] = useState<string[]>([])
+  const [selected, setSelected] = useState<string[]>(courseParam ? [courseParam] : [])
   const [session, setSession] = useState<SessionOut | null>(null)
   const [result, setResult] = useState<{ correct: boolean; part_results: PartResult[]; solution_md: string } | null>(null)
   const [finish, setFinish] = useState<FinishOut | null>(null)
   const [busy, setBusy] = useState(false)
+  const autoStarted = useRef(false)
 
   const toggle = (slug: string) =>
     setSelected((s) => (s.includes(slug) ? s.filter((x) => x !== slug) : [...s, slug]))
 
-  const start = async () => {
+  const start = async (slugs: string[] = selected) => {
+    if (!slugs.length) return
     setBusy(true)
     try {
       const s = await api<SessionOut>('/api/diagnostic/start', {
         method: 'POST',
-        body: JSON.stringify({ course_slugs: selected }),
+        body: JSON.stringify({ course_slugs: slugs }),
       })
       setSession(s)
     } finally {
       setBusy(false)
     }
   }
+
+  // Launched for a specific course (from its page): start straight away.
+  useEffect(() => {
+    if (courseParam && courses && !session && !autoStarted.current) {
+      autoStarted.current = true
+      start([courseParam])
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [courseParam, courses])
 
   const submit = async (answers: string[], _hintsUsed: number) => {
     if (!session?.probe) return
@@ -87,11 +102,30 @@ export default function DiagnosticPage() {
     return (
       <div className="complete-card" style={{ marginTop: 40 }}>
         <h2>Placement complete</h2>
-        <p>
-          After {finish.questions_asked} questions, {finish.placed_mastered} topics were
-          marked as already known. They'll resurface as reviews over the next few weeks
-          to confirm — your daily queue now starts right at your learning edge.
-        </p>
+        {finish.failed_placement ? (
+          <>
+            <p>
+              You missed every question, so this course looks like it starts above where you
+              are right now — that's completely fine. The best move is to build the
+              groundwork first{finish.suggested_earlier.length ? ', starting with:' : '.'}
+            </p>
+            {finish.suggested_earlier.length > 0 && (
+              <ul className="resource-list" style={{ marginTop: 12 }}>
+                {finish.suggested_earlier.map((c) => (
+                  <li key={c.slug}>
+                    <Link to={`/courses/${c.slug}`}>{c.title}</Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
+        ) : (
+          <p>
+            After {finish.questions_asked} questions, {finish.placed_mastered} topics were
+            marked as already known. They'll resurface as reviews over the next few weeks
+            to confirm — your daily queue now starts right at your learning edge.
+          </p>
+        )}
         <div style={{ marginTop: 22 }}>
           <Link to="/" className="btn">
             Go to Today
@@ -158,7 +192,7 @@ export default function DiagnosticPage() {
           </label>
         ))}
         <div style={{ marginTop: 18 }}>
-          <button className="btn" disabled={selected.length === 0 || busy} onClick={start}>
+          <button className="btn" disabled={selected.length === 0 || busy} onClick={() => start()}>
             {busy ? 'Starting…' : 'Start diagnostic →'}
           </button>
         </div>

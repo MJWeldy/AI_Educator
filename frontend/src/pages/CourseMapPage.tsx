@@ -31,6 +31,23 @@ export default function CourseMapPage() {
     queryClient.invalidateQueries()
   }
 
+  const setCategory = async () => {
+    if (!course) return
+    const category = window.prompt('Subject / category (e.g. Mathematics, Ecology):', course.category)
+    if (category === null || category.trim() === course.category) return
+    await api(`/api/courses/${course.slug}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ category: category.trim() }),
+    })
+    queryClient.invalidateQueries()
+  }
+
+  const toggleEnroll = async () => {
+    if (!course) return
+    await api(`/api/courses/${course.slug}/enroll`, { method: course.enrolled ? 'DELETE' : 'PUT' })
+    queryClient.invalidateQueries()
+  }
+
   const deleteCourse = async () => {
     if (!course?.document_id) return
     if (
@@ -49,13 +66,37 @@ export default function CourseMapPage() {
 
   return (
     <>
-      <div className="page-kicker rise">Course{course.level ? ` · ${course.level}` : ''}</div>
+      <div className="page-kicker rise">
+        {[course.category, course.level].filter(Boolean).join(' · ') || 'Course'}
+      </div>
       <h1 className="page-title rise rise-1">{course.title}</h1>
       <p className="page-sub rise rise-2">{course.description}</p>
+
+      <div className="rise rise-2" style={{ margin: '4px 0 22px', display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+        <button className={`btn${course.enrolled ? ' secondary' : ''}`} onClick={toggleEnroll}>
+          {course.enrolled ? '✓ Enrolled' : 'Enroll'}
+        </button>
+        <Link
+          to={`/diagnostic?course=${course.slug}`}
+          className="btn secondary"
+          style={{ padding: '6px 14px', fontSize: 12 }}
+        >
+          Take placement exam →
+        </Link>
+        {!course.enrolled && (
+          <span className="mono muted" style={{ fontSize: 12 }}>
+            Enroll to see this course's lessons in Today.
+          </span>
+        )}
+      </div>
+
       {course.document_id != null && (
         <div className="rise rise-2" style={{ margin: '-16px 0 26px', display: 'flex', gap: 10 }}>
           <button className="btn secondary" style={{ padding: '6px 14px', fontSize: 12 }} onClick={renameCourse}>
             Rename
+          </button>
+          <button className="btn secondary" style={{ padding: '6px 14px', fontSize: 12 }} onClick={setCategory}>
+            Set category
           </button>
           <button className="btn secondary danger" style={{ padding: '6px 14px', fontSize: 12 }} onClick={deleteCourse}>
             Delete this course

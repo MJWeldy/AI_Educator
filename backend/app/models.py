@@ -36,6 +36,7 @@ class Course(Base):
     title: Mapped[str] = mapped_column(String)
     description: Mapped[str] = mapped_column(Text, default="")
     level: Mapped[str] = mapped_column(String, default="")  # e.g. "Grades 3–8", "Undergraduate"
+    category: Mapped[str] = mapped_column(String, default="", server_default="")  # subject grouping, e.g. "Mathematics"
     sequence_order: Mapped[int] = mapped_column(Integer, default=0)
     source: Mapped[str] = mapped_column(String, default="seed")  # seed | document
     document_id: Mapped[int | None] = mapped_column(ForeignKey("documents.id"), nullable=True)
@@ -126,6 +127,31 @@ class Profile(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String, default="Learner")
+    # Set only in server mode (login). Local-mode profiles have neither.
+    username: Mapped[str | None] = mapped_column(String, unique=True, index=True, nullable=True)
+    password_hash: Mapped[str | None] = mapped_column(String, nullable=True)
+
+
+class AuthSession(Base):
+    """A logged-in server session: a random token cookie mapped to a profile."""
+
+    __tablename__ = "auth_sessions"
+
+    token: Mapped[str] = mapped_column(String, primary_key=True)
+    profile_id: Mapped[int] = mapped_column(ForeignKey("profiles.id"), index=True)
+    created_at: Mapped[datetime] = mapped_column(default=utcnow)
+    expires_at: Mapped[datetime] = mapped_column()
+
+
+class Enrollment(Base):
+    """A profile has opted into a course: its lessons appear in Today and it can
+    be placed into via a per-course placement exam."""
+
+    __tablename__ = "enrollments"
+
+    profile_id: Mapped[int] = mapped_column(ForeignKey("profiles.id"), primary_key=True)
+    course_id: Mapped[int] = mapped_column(ForeignKey("courses.id"), primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(default=utcnow)
 
 
 class UserTopicState(Base):
@@ -218,6 +244,28 @@ class Document(Base):
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
     page_count: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime] = mapped_column(default=utcnow)
+
+    files: Mapped[list["DocumentFile"]] = relationship(
+        back_populates="document",
+        order_by="DocumentFile.position",
+        cascade="all, delete-orphan",
+    )
+
+
+class DocumentFile(Base):
+    """One source file within an upload. A single-PDF upload has one row; a
+    folder upload has many. Ingestion turns each file into a top-level section."""
+
+    __tablename__ = "document_files"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    document_id: Mapped[int] = mapped_column(ForeignKey("documents.id"), index=True)
+    filename: Mapped[str] = mapped_column(String)  # relative path within the upload
+    stored_path: Mapped[str] = mapped_column(String)
+    position: Mapped[int] = mapped_column(Integer, default=0)
+    kind: Mapped[str] = mapped_column(String, default="pdf")  # pdf | text
+
+    document: Mapped[Document] = relationship(back_populates="files")
 
 
 class DocumentSection(Base):

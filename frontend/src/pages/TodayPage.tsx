@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { api } from '../api/client'
+import type { CourseSummary } from '../api/types'
 
 interface TaskOut {
   id: number
@@ -34,10 +35,15 @@ export default function TodayPage() {
     queryKey: ['stats'],
     queryFn: () => api<{ attempts_total: number }>('/api/stats'),
   })
+  const { data: courses } = useQuery({
+    queryKey: ['courses'],
+    queryFn: () => api<CourseSummary[]>('/api/courses'),
+  })
 
   if (isLoading || !data) return <p className="muted">Loading…</p>
 
   const brandNew = stats !== undefined && stats.attempts_total === 0
+  const anyEnrolled = (courses ?? []).some((c) => c.enrolled)
 
   const pct = Math.min(100, (100 * data.xp_today) / data.daily_goal)
   const goalMet = data.xp_today >= data.daily_goal
@@ -74,9 +80,16 @@ export default function TodayPage() {
       </div>
 
       <div className="rise rise-3">
-        {data.tasks.length === 0 && (
-          <p className="muted">Nothing queued — visit a course and start any unlocked topic.</p>
-        )}
+        {data.tasks.length === 0 &&
+          (anyEnrolled ? (
+            <p className="muted">You're all caught up for today — nice work.</p>
+          ) : (
+            <p className="muted">
+              You're not enrolled in any courses yet. Head to{' '}
+              <Link to="/courses">Courses</Link> and enroll in one to start seeing lessons
+              here.
+            </p>
+          ))}
         {data.tasks.map((t) => {
           const done = t.status === 'done'
           const to = t.type === 'lesson' ? `/learn/${t.topic_ids[0]}` : `/task/${t.id}`

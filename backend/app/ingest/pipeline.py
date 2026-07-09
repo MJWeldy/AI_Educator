@@ -5,7 +5,7 @@ stopped and the LLM cache makes re-runs nearly free."""
 from ..db import SessionLocal
 from ..jobs import handler, set_progress
 from ..models import Document, Job
-from . import derive, extract, generate, segment
+from . import derive, extract, generate, readings, segment
 
 
 @handler("ingest_document")
@@ -46,6 +46,7 @@ async def ingest_document(job_id: int) -> None:
         with SessionLocal() as db:
             doc = db.get(Document, doc_id)
             await derive.derive_topics(db, doc, progress=progress)
+            readings.attach_readings(db, doc)
             doc.status = "generating"
             db.commit()
 

@@ -69,6 +69,8 @@ def test_create_select_and_isolation(client):
 
 
 def test_tasks_are_profile_scoped(client):
+    slug = client.get("/api/courses").json()[0]["slug"]
+    client.put(f"/api/courses/{slug}/enroll")
     today = client.get("/api/tasks/today").json()
     task_ids = [t["id"] for t in today["tasks"]]
     assert task_ids

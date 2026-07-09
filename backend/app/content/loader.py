@@ -61,6 +61,7 @@ def load_seed(db: Session, seed_dir: Path = SEED_DIR) -> dict:
         course.title = doc["title"]
         course.description = doc.get("description", "")
         course.level = doc.get("level", "")
+        course.category = doc.get("category", "Mathematics")
         course.sequence_order = doc.get("sequence_order", 0)
         db.flush()
         stats["courses"] += 1

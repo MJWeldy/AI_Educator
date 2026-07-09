@@ -1,5 +1,7 @@
 """Ingestion pipeline against a synthetic fixture PDF and a fake LLM."""
 
+from pathlib import Path
+
 import fitz
 import pytest
 from sqlalchemy import select
@@ -92,6 +94,90 @@ def test_segment_without_toc(db, tmp_path):
     assert len(leaves) == 3  # 25 pages / 10 per chunk
 
 
+def test_extract_and_segment_multifile(db, tmp_path, monkeypatch):
+    from app import config
+    from app.ingest import extract as extract_mod
+    from app.models import DocumentFile
+
+    monkeypatch.setattr(config.settings, "extracted_dir", tmp_path / "extracted")
+
+    # A small PDF plus a markdown note, uploaded as one "folder".
+    pdf_path = tmp_path / "book.pdf"
+    pdf = fitz.open()
+    for i in range(3):
+        pdf.new_page().insert_text((72, 72), f"chapter text page {i} " * 30, fontsize=11)
+    pdf.save(str(pdf_path))
+    pdf.close()
+    md_path = tmp_path / "notes.md"
+    md_path.write_text("# My notes\n\nSome markdown about vectors and spaces.\n")
+
+    document = Document(filename="my-folder", stored_path="")
+    db.add(document)
+    db.flush()
+    db.add(DocumentFile(document_id=document.id, filename="my-folder/book.pdf",
+                        stored_path=str(pdf_path), position=0, kind="pdf"))
+    db.add(DocumentFile(document_id=document.id, filename="my-folder/notes.md",
+                        stored_path=str(md_path), position=1, kind="text"))
+    db.commit()
+
+    extracted = extract_mod.extract(document)
+    assert len(extracted["sources"]) == 2
+    assert extracted["page_count"] == 4  # 3 pdf pages + 1 text "page"
+
+    sections = segment.build_sections(db, document, extracted)
+    chapters = [s for s in sections if s.level == 1]
+    assert {c.title for c in chapters} == {"my-folder/book.pdf", "my-folder/notes.md"}
+    # Each file contributes at least one leaf, and the markdown text is captured.
+    leaves = [s for s in sections if s.level == 2]
+    assert leaves and all(s.parent_id for s in leaves)
+    assert any("markdown about vectors" in s.text for s in leaves)
+
+
+def test_upload_folder_endpoint(db, fixture_pdf, tmp_path, monkeypatch):
+    from fastapi.testclient import TestClient
+
+    from app import config
+    from app.db import get_db
+    from app.main import app
+    from app.models import DocumentFile
+
+    monkeypatch.setattr(config.settings, "uploads_dir", tmp_path / "uploads")
+    monkeypatch.setattr(config.settings, "extracted_dir", tmp_path / "extracted")
+
+    def override_db():
+        yield db
+
+    app.dependency_overrides[get_db] = override_db
+    pdf_bytes = fixture_pdf.read_bytes()
+    try:
+        with TestClient(app) as client:
+            res = client.post(
+                "/api/documents",
+                files=[
+                    ("files", ("mybook/intro.md", b"# Intro\n\nVectors and spaces.\n", "text/markdown")),
+                    ("files", ("mybook/text.pdf", pdf_bytes, "application/pdf")),
+                    ("files", ("mybook/skip.bin", b"\x00\x01", "application/octet-stream")),
+                ],
+            )
+            assert res.status_code == 200
+            doc_id = res.json()["id"]
+            # Folder name becomes the label; unsupported .bin is skipped.
+            assert res.json()["filename"] == "mybook"
+    finally:
+        app.dependency_overrides.clear()
+
+    doc = db.get(Document, doc_id)
+    files = db.scalars(select(DocumentFile).where(DocumentFile.document_id == doc_id)).all()
+    assert len(files) == 2 and {f.kind for f in files} == {"pdf", "text"}
+    for f in files:
+        assert Path(f.stored_path).exists()
+
+    extracted = extract.extract(doc)
+    sections = segment.build_sections(db, doc, extracted)
+    chapters = [s for s in sections if s.level == 1]
+    assert {c.title for c in chapters} == {"mybook/intro.md", "mybook/text.pdf"}
+
+
 def test_verify_problem():
     good_numeric = [{"answer_type": "numeric", "canonical": "3/4", "prompt_md": "x"}]
     assert verify_problem(good_numeric)
@@ -168,6 +254,19 @@ async def test_derive_and_generate_with_fake_llm(seeded_db, doc, monkeypatch):
     topics = seeded_db.scalars(select(Topic).where(Topic.course_id == course.id)).all()
     assert topics and all(t.status == "draft" for t in topics)
 
+    # Each document topic gets a grounded reading pointing back at its section.
+    from app.ingest.readings import attach_readings
+    from app.models import Resource
+
+    added = attach_readings(seeded_db, doc)
+    assert added == len(topics)
+    assert attach_readings(seeded_db, doc) == 0  # idempotent — no duplicates
+    for t in topics:
+        reading = seeded_db.scalar(
+            select(Resource).where(Resource.topic_id == t.id, Resource.kind == "reading")
+        )
+        assert reading is not None and reading.title
+
     await generate.generate_content(seeded_db, doc)
     for t in topics:
         lesson = seeded_db.scalar(select(Lesson).where(Lesson.topic_id == t.id))
@@ -243,6 +342,13 @@ async def test_delete_document_removes_everything(seeded_db, doc, monkeypatch):
             res = client.patch(f"/api/courses/{course.slug}", json={"title": "My Paper"})
             assert res.status_code == 200 and res.json()["title"] == "My Paper"
             assert seeded_db.get(Document, doc.id).title == "My Paper"
+            # ...and categorized, without disturbing the title.
+            res = client.patch(f"/api/courses/{course.slug}", json={"category": "Ecology"})
+            assert res.status_code == 200
+            assert res.json()["category"] == "Ecology" and res.json()["title"] == "My Paper"
+            # Built-in (seed) courses are managed by the curriculum, not editable here.
+            seed_slug = seeded_db.scalar(select(Course.slug).where(Course.source == "seed"))
+            assert client.patch(f"/api/courses/{seed_slug}", json={"category": "X"}).status_code == 409
             assert client.delete(f"/api/documents/{doc.id}").status_code == 200
     finally:
         app.dependency_overrides.clear()

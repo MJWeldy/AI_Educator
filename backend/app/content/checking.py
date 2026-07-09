@@ -7,6 +7,7 @@ Expression input is sanitized to a strict token whitelist before it ever
 reaches sympy's parser (which uses eval under the hood).
 """
 
+import multiprocessing
 import re
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import TimeoutError as FutureTimeout
@@ -17,14 +18,42 @@ ALLOWED_NAMES = {"x", "y", "a", "b", "n", "t", "pi", "sqrt"}
 _TOKEN_RE = re.compile(r"[A-Za-z_]+")
 _SAFE_RE = re.compile(r"^[0-9A-Za-z_+\-*/^().\s]+$")
 
+WARMUP_TIMEOUT_S = 30.0
+
 _pool: ProcessPoolExecutor | None = None
+_warmup = None
+
+
+def _import_sympy() -> None:
+    import sympy  # noqa: F401
 
 
 def _get_pool() -> ProcessPoolExecutor:
-    global _pool
+    global _pool, _warmup
     if _pool is None:
-        _pool = ProcessPoolExecutor(max_workers=1)
+        # "spawn", never fork: a forked worker inherits the server's listening
+        # socket and can steal (then never read) incoming HTTP connections,
+        # freezing those requests forever.
+        _pool = ProcessPoolExecutor(
+            max_workers=1, mp_context=multiprocessing.get_context("spawn")
+        )
+        # Pre-import sympy in the worker so real checks don't spend their
+        # EXPR_TIMEOUT_S budget on interpreter + sympy startup.
+        _warmup = _pool.submit(_import_sympy)
     return _pool
+
+
+def warm_pool() -> None:
+    """Start the worker ahead of time (called once at app startup)."""
+    _get_pool()
+
+
+def _submit(fn, *args):
+    """Submit to a warmed-up worker, so task timeouts measure only the task."""
+    pool = _get_pool()
+    if _warmup is not None and not _warmup.done():
+        _warmup.result(timeout=WARMUP_TIMEOUT_S)
+    return pool.submit(fn, *args)
 
 
 def _kill_pool() -> None:
@@ -115,8 +144,8 @@ def check_expression(user: str, canonical: str) -> tuple[bool, str | None]:
     clean = sanitize_expression(user)
     if clean is None:
         return False, "only numbers, x/y variables, + - * / ^ and sqrt() are allowed"
-    fut = _get_pool().submit(_expr_check, clean, canonical)
     try:
+        fut = _submit(_expr_check, clean, canonical)
         return fut.result(timeout=EXPR_TIMEOUT_S)
     except FutureTimeout:
         _kill_pool()
@@ -130,8 +159,8 @@ def preview_latex(expr: str) -> str | None:
     clean = sanitize_expression(expr)
     if clean is None:
         return None
-    fut = _get_pool().submit(_expr_latex, clean)
     try:
+        fut = _submit(_expr_latex, clean)
         return fut.result(timeout=EXPR_TIMEOUT_S)
     except Exception:
         _kill_pool()

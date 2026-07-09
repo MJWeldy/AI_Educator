@@ -6,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from . import models  # noqa: F401 — register tables on Base
 from . import jobs
 from .api import (
+    auth,
     courses,
     diagnostic,
     documents,
@@ -19,6 +20,7 @@ from .api import (
 )
 from .ingest import pipeline  # noqa: F401 — registers the ingest_document job handler
 from .config import settings
+from .content import checking
 from .content.loader import load_seed
 from .db import SessionLocal
 
@@ -41,10 +43,12 @@ async def lifespan(app: FastAPI):
         load_seed(db)
     jobs.set_loop(asyncio.get_running_loop())
     jobs.resume_pending()
+    checking.warm_pool()
     yield
 
 
 app = FastAPI(title="Educator", lifespan=lifespan)
+app.include_router(auth.router)
 app.include_router(courses.router)
 app.include_router(topics.router)
 app.include_router(learn.router)

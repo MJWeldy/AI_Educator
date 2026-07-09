@@ -33,9 +33,11 @@ class CourseSummary(BaseModel):
     title: str
     description: str
     level: str = ""
+    category: str = ""
     document_id: int | None = None
     sequence_order: int
     source: str
+    enrolled: bool = False
     topic_count: int
     learned_count: int
     mastered_count: int

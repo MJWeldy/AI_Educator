@@ -2,6 +2,7 @@ import random
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..content import checking
@@ -80,6 +81,19 @@ def start(
     session = diag.start_session(db, profile_id, body.course_slugs, graph)
     if not session.belief:
         raise HTTPException(400, "no probeable topics in the chosen courses")
+    # Placing into a course enrolls you in it, so its lessons show up in Today.
+    from ..engine import scheduler
+    from ..models import Course, Enrollment
+
+    changed = False
+    for slug in body.course_slugs:
+        course = db.scalar(select(Course).where(Course.slug == slug))
+        if course is not None and db.get(Enrollment, (profile_id, course.id)) is None:
+            db.add(Enrollment(profile_id=profile_id, course_id=course.id))
+            changed = True
+    if changed:
+        db.commit()
+        scheduler.reset_today_if_fresh(db, profile_id)
     return _session_out(db, session, graph)
 
 
@@ -140,9 +154,16 @@ def answer(
     return AnswerOut(correct=correct, part_results=part_results, session=_session_out(db, session, graph))
 
 
+class SuggestedCourse(BaseModel):
+    slug: str
+    title: str
+
+
 class FinishOut(BaseModel):
     placed_mastered: int
     questions_asked: int
+    failed_placement: bool = False
+    suggested_earlier: list[SuggestedCourse] = []
 
 
 @router.post("/{session_id}/finish", response_model=FinishOut)

@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from ..content import checking
 from ..content.llm_content import LESSON_SCHEMA, LESSON_SYSTEM
+from ..content.worked_examples import normalize_worked_examples
 from ..llm import router
 from ..llm.base import JobType, Message
 from ..llm.cache import cached_complete_json
@@ -118,11 +119,7 @@ async def generate_content(db: Session, doc: Document, progress=None) -> None:
                 ],
                 LESSON_SCHEMA,
             )
-            examples = [
-                ex
-                for ex in (result.get("worked_examples") or [])
-                if isinstance(ex, dict) and ex.get("problem_md") and ex.get("solution_md")
-            ]
+            examples = normalize_worked_examples(result.get("worked_examples"))
             db.add(
                 Lesson(
                     topic_id=topic.id,

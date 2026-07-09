@@ -32,9 +32,11 @@ export interface CourseSummary {
   title: string
   description: string
   level: string
+  category: string
   document_id: number | null
   sequence_order: number
   source: string
+  enrolled: boolean
   topic_count: number
   learned_count: number
   mastered_count: number
@@ -69,4 +71,15 @@ export interface TopicDetail {
   lesson: LessonOut | null
   resources: ResourceOut[]
   prereqs: TopicNode[]
+}
+
+export interface AuthUser {
+  id: number
+  username: string | null
+  name: string
+}
+
+export interface MeOut {
+  require_auth: boolean
+  user: AuthUser | null
 }

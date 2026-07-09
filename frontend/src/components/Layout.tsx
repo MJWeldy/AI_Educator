@@ -1,4 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { api } from '../api/client'
+import type { MeOut } from '../api/types'
 import ProfileSwitcher from './ProfileSwitcher'
 
 const links = [
@@ -9,7 +12,34 @@ const links = [
   { to: '/settings', label: 'Settings' },
 ]
 
+function AccountMenu({ name }: { name: string }) {
+  const queryClient = useQueryClient()
+  const logout = async () => {
+    await api('/api/auth/logout', { method: 'POST' })
+    queryClient.clear() // drop this user's cached data before the login screen
+    await queryClient.invalidateQueries({ queryKey: ['auth-me'] })
+  }
+  return (
+    <div className="account-menu">
+      <div className="account-name">
+        <span className="dot" />
+        {name}
+      </div>
+      <button className="account-logout" onClick={logout}>
+        Log out
+      </button>
+    </div>
+  )
+}
+
 export default function Layout() {
+  const { data: me } = useQuery({
+    queryKey: ['auth-me'],
+    queryFn: () => api<MeOut>('/api/auth/me'),
+    retry: false,
+  })
+  const serverMode = me?.require_auth ?? false
+
   return (
     <div className="shell">
       <aside className="sidebar">
@@ -24,8 +54,8 @@ export default function Layout() {
             </NavLink>
           ))}
         </nav>
-        <ProfileSwitcher />
-        <div className="foot">local · offline-first</div>
+        {serverMode ? <AccountMenu name={me?.user?.name ?? 'Account'} /> : <ProfileSwitcher />}
+        <div className="foot">{serverMode ? 'server · multi-user' : 'local · offline-first'}</div>
       </aside>
       <main className="main">
         <Outlet />

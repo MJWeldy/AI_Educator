@@ -21,6 +21,7 @@ interface ReviewTopic {
   description: string
   est_minutes: number
   prereq_titles: string[]
+  readings: string[]
   lesson_md: string | null
   worked_examples: { problem_md: string; solution_md: string }[]
   problems: ReviewProblem[]
@@ -135,6 +136,11 @@ export default function DocumentReviewPage() {
                     {t.prereq_titles.length > 0 && (
                       <p className="mono muted" style={{ fontSize: 12 }}>
                         requires: {t.prereq_titles.join(' · ')}
+                      </p>
+                    )}
+                    {t.readings.length > 0 && (
+                      <p className="mono muted" style={{ fontSize: 12 }}>
+                        reading: {t.readings.join(' · ')}
                       </p>
                     )}
                     {t.lesson_md && (

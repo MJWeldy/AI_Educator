@@ -12,6 +12,7 @@ from ..llm import router
 from ..llm.base import JobType, Message
 from ..llm.cache import cached_complete_json
 from ..models import Lesson, Topic
+from .worked_examples import normalize_worked_examples
 
 LESSON_SCHEMA = {
     "type": "object",
@@ -72,7 +73,7 @@ async def generate_lesson(db: Session, topic: Topic) -> Lesson:
     lesson = Lesson(
         topic_id=topic.id,
         content_md=result["content_md"],
-        worked_examples=result["worked_examples"],
+        worked_examples=normalize_worked_examples(result.get("worked_examples")),
         source="llm",
         model=f"{choice.provider_name}:{choice.model}",
         review_status="approved",

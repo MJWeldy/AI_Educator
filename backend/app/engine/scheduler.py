@@ -7,7 +7,7 @@ from datetime import date, datetime, timezone
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from ..models import Mastery, Task, Topic, UserTopicState
+from ..models import Enrollment, Mastery, Task, Topic, UserTopicState
 from . import xp
 from .graph import TopicGraph, effective_masteries, frontier
 
@@ -63,6 +63,26 @@ def _quiz_due(db: Session, profile_id: int, today: str, learned_pool: int) -> bo
         .distinct()
     ).all()
     return len(active_days) >= QUIZ_EVERY_ACTIVE_DAYS
+
+
+def reset_today_if_fresh(db: Session, profile_id: int) -> None:
+    """Drop today's queue so it rebuilds on next fetch — but only if nothing in
+    it has been touched yet. Used when enrollment changes what should appear.
+    Started or completed work is left alone (new lessons arrive next day)."""
+    today = date.today().isoformat()
+    tasks = db.scalars(
+        select(Task).where(Task.profile_id == profile_id, Task.for_date == today)
+    ).all()
+    if not tasks:
+        return
+    for t in tasks:
+        if t.status == "done" or t.xp_awarded:
+            return
+        if any(p.get("done") for p in (t.payload or {}).get("problems", [])):
+            return
+    for t in tasks:
+        db.delete(t)
+    db.commit()
 
 
 def build_today(db: Session, profile_id: int, now: datetime | None = None) -> list[Task]:
@@ -149,10 +169,14 @@ def build_today(db: Session, profile_id: int, now: datetime | None = None) -> li
             )
             budget -= QUIZ_XP
 
-    # 3. New lessons on the frontier fill what's left of the goal.
+    # 3. New lessons on the frontier fill what's left of the goal — but only
+    #    from courses the learner has enrolled in.
+    enrolled = set(
+        db.scalars(select(Enrollment.course_id).where(Enrollment.profile_id == profile_id))
+    )
     course_order = {t.id: (t.course.sequence_order, t.depth_rank, -len(graph.dependents[t.id]))
                     for t in graph.topics.values()}
-    ready = [tid for tid in frontier(graph, masteries)]
+    ready = [tid for tid in frontier(graph, masteries) if graph.topics[tid].course_id in enrolled]
     ready.sort(key=lambda tid: course_order[tid])
     for tid in ready:
         if budget <= 0:

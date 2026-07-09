@@ -3,10 +3,14 @@ from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from .. import auth
+from ..config import settings
 from ..db import get_db
 from ..models import (
     Attempt,
+    AuthSession,
     DiagnosticSession,
+    Enrollment,
     Profile,
     Task,
     UserTopicState,
@@ -46,6 +50,13 @@ def _all_profiles(db: Session) -> list[ProfileOut]:
 def list_profiles(
     db: Session = Depends(get_db), profile_id: int = Depends(current_profile_id)
 ):
+    # In server mode you only ever see your own account — no switching.
+    if settings.require_auth:
+        me = db.get(Profile, profile_id)
+        return ProfilesOut(
+            current_id=profile_id,
+            profiles=[ProfileOut(id=me.id, name=me.name, total_xp=0)] if me else [],
+        )
     return ProfilesOut(current_id=profile_id, profiles=_all_profiles(db))
 
 
@@ -55,6 +66,8 @@ class ProfileIn(BaseModel):
 
 @router.post("", response_model=ProfileOut)
 def create_profile(body: ProfileIn, db: Session = Depends(get_db)):
+    if settings.require_auth:
+        raise HTTPException(403, "create an account with a username and password instead")
     name = body.name.strip()
     if not name:
         raise HTTPException(400, "name required")
@@ -77,6 +90,8 @@ def rename_profile(profile_id: int, body: ProfileIn, db: Session = Depends(get_d
 
 @router.post("/{profile_id}/select", response_model=ProfilesOut)
 def select_profile(profile_id: int, response: Response, db: Session = Depends(get_db)):
+    if settings.require_auth:
+        raise HTTPException(403, "log in to switch accounts")
     if db.get(Profile, profile_id) is None:
         raise HTTPException(404, "profile not found")
     response.set_cookie(
@@ -96,19 +111,23 @@ def delete_profile(
     db: Session = Depends(get_db),
     current: int = Depends(current_profile_id),
 ):
+    # In server mode you can only delete your own account, never someone else's.
+    if settings.require_auth and profile_id != current:
+        raise HTTPException(403, "you can only delete your own account")
     profile = db.get(Profile, profile_id)
     if profile is None:
         raise HTTPException(404, "profile not found")
-    if db.scalar(select(func.count()).select_from(Profile)) <= 1:
+    if not settings.require_auth and db.scalar(select(func.count()).select_from(Profile)) <= 1:
         raise HTTPException(409, "cannot delete the last profile")
 
     # All progress goes with the profile. Content (courses, lessons) is shared.
     # Order matters: attempts and XP entries reference tasks.
-    for model in (UserTopicState, Attempt, XpEntry, Task, DiagnosticSession):
+    for model in (UserTopicState, Attempt, XpEntry, Task, DiagnosticSession, Enrollment, AuthSession):
         for row in db.scalars(select(model).where(model.profile_id == profile_id)):
             db.delete(row)
     db.delete(profile)
     db.commit()
     if current == profile_id:
         response.delete_cookie(PROFILE_COOKIE, path="/")
+        response.delete_cookie(auth.SESSION_COOKIE, path="/")
     return {"ok": True}

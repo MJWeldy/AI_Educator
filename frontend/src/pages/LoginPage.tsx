@@ -1,10 +1,16 @@
 import { useState, type FormEvent } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { api, ApiError } from '../api/client'
-import type { AuthUser } from '../api/types'
+import type { AuthUser, MeOut } from '../api/types'
 
 export default function LoginPage() {
   const queryClient = useQueryClient()
+  const { data: me } = useQuery({
+    queryKey: ['auth-me'],
+    queryFn: () => api<MeOut>('/api/auth/me'),
+    retry: false,
+  })
+  const allowSignup = me?.allow_signup ?? false
   const [mode, setMode] = useState<'login' | 'register'>('login')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -77,16 +83,22 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <button
-          type="button"
-          className="auth-switch"
-          onClick={() => {
-            setMode(mode === 'login' ? 'register' : 'login')
-            setError(null)
-          }}
-        >
-          {mode === 'login' ? 'Need an account? Sign up' : 'Already have an account? Log in'}
-        </button>
+        {allowSignup ? (
+          <button
+            type="button"
+            className="auth-switch"
+            onClick={() => {
+              setMode(mode === 'login' ? 'register' : 'login')
+              setError(null)
+            }}
+          >
+            {mode === 'login' ? 'Need an account? Sign up' : 'Already have an account? Log in'}
+          </button>
+        ) : (
+          <p className="muted" style={{ fontSize: 12.5, marginTop: 16, textAlign: 'center' }}>
+            Sign-ups are closed — ask the owner to create an account for you.
+          </p>
+        )}
       </div>
     </div>
   )

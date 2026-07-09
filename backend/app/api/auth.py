@@ -27,6 +27,7 @@ class UserOut(BaseModel):
 
 class MeOut(BaseModel):
     require_auth: bool
+    allow_signup: bool
     user: UserOut | None
 
 
@@ -37,8 +38,15 @@ def _set_session_cookie(response: Response, token: str) -> None:
         max_age=COOKIE_MAX_AGE,
         httponly=True,
         samesite="lax",
+        secure=settings.secure_cookies,
         path="/",
     )
+
+
+def _rate_limit(request: Request) -> None:
+    client = request.client.host if request.client else "unknown"
+    if not auth.login_limiter.allow(client):
+        raise HTTPException(429, "too many attempts — wait a minute and try again")
 
 
 def _user_out(profile: Profile) -> UserOut:
@@ -53,13 +61,20 @@ def me(request: Request, db: Session = Depends(get_db)):
         pid = auth.profile_id_for_token(db, request.cookies.get(auth.SESSION_COOKIE))
         if pid is not None:
             profile = db.get(Profile, pid)
-    return MeOut(require_auth=settings.require_auth, user=_user_out(profile) if profile else None)
+    return MeOut(
+        require_auth=settings.require_auth,
+        allow_signup=settings.require_auth and settings.allow_signup,
+        user=_user_out(profile) if profile else None,
+    )
 
 
 @router.post("/register", response_model=UserOut)
-def register(body: Credentials, response: Response, db: Session = Depends(get_db)):
+def register(body: Credentials, request: Request, response: Response, db: Session = Depends(get_db)):
     if not settings.require_auth:
         raise HTTPException(409, "accounts are only used in server mode")
+    if not settings.allow_signup:
+        raise HTTPException(403, "sign-ups are closed — ask the owner to create an account for you")
+    _rate_limit(request)
     username = body.username.strip()
     if not username:
         raise HTTPException(400, "username required")
@@ -79,9 +94,10 @@ def register(body: Credentials, response: Response, db: Session = Depends(get_db
 
 
 @router.post("/login", response_model=UserOut)
-def login(body: Credentials, response: Response, db: Session = Depends(get_db)):
+def login(body: Credentials, request: Request, response: Response, db: Session = Depends(get_db)):
     if not settings.require_auth:
         raise HTTPException(409, "accounts are only used in server mode")
+    _rate_limit(request)
     profile = db.scalar(
         select(Profile).where(func.lower(Profile.username) == body.username.strip().lower())
     )

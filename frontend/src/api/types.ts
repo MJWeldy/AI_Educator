@@ -81,5 +81,6 @@ export interface AuthUser {
 
 export interface MeOut {
   require_auth: boolean
+  allow_signup: boolean
   user: AuthUser | null
 }

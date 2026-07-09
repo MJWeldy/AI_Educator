@@ -1,9 +1,16 @@
 import pytest
 from fastapi.testclient import TestClient
 
+from app import auth
 from app.config import settings
 from app.db import get_db
 from app.main import app
+
+
+@pytest.fixture(autouse=True)
+def _reset_rate_limiter():
+    # The limiter is a process-global; clear it so tests don't bleed into each other.
+    auth.login_limiter._hits.clear()
 
 
 @pytest.fixture()
@@ -34,6 +41,7 @@ def server_client(seeded_db, monkeypatch):
 def test_me_reports_auth_required_when_logged_out(server_client):
     me = server_client.get("/api/auth/me").json()
     assert me["require_auth"] is True and me["user"] is None
+    assert me["allow_signup"] is True  # open sign-ups unless closed (--web)
 
 
 def test_protected_endpoint_401_without_login(server_client):
@@ -94,5 +102,52 @@ def test_accounts_are_isolated(server_client):
 
 def test_auth_endpoints_noop_in_local_mode(client):
     # Without server mode, register/login are disabled and me() reports it.
-    assert client.get("/api/auth/me").json() == {"require_auth": False, "user": None}
+    assert client.get("/api/auth/me").json() == {
+        "require_auth": False,
+        "allow_signup": False,
+        "user": None,
+    }
     assert client.post("/api/auth/register", json={"username": "x", "password": "yyyyyy"}).status_code == 409
+
+
+def test_closed_signups_block_registration(seeded_db, monkeypatch):
+    monkeypatch.setattr(settings, "require_auth", True)
+    monkeypatch.setattr(settings, "allow_signup", False)
+
+    def override_db():
+        yield seeded_db
+
+    app.dependency_overrides[get_db] = override_db
+    with TestClient(app) as c:
+        assert c.get("/api/auth/me").json()["allow_signup"] is False
+        assert c.post("/api/auth/register", json={"username": "x", "password": "yyyyyy"}).status_code == 403
+        # Owner-provisioned accounts still log in normally.
+        from app.models import Profile
+
+        seeded_db.add(Profile(name="ann", username="ann", password_hash=auth.hash_password("secret1")))
+        seeded_db.commit()
+        assert c.post("/api/auth/login", json={"username": "ann", "password": "secret1"}).status_code == 200
+    app.dependency_overrides.clear()
+
+
+def test_login_is_rate_limited(server_client):
+    for _ in range(10):
+        server_client.post("/api/auth/login", json={"username": "nobody", "password": "x"})
+    # 11th attempt within the window is rejected.
+    assert server_client.post("/api/auth/login", json={"username": "nobody", "password": "x"}).status_code == 429
+
+
+def test_web_mode_sets_secure_cookie(seeded_db, monkeypatch):
+    monkeypatch.setattr(settings, "require_auth", True)
+    monkeypatch.setattr(settings, "secure_cookies", True)
+
+    def override_db():
+        yield seeded_db
+
+    app.dependency_overrides[get_db] = override_db
+    # base_url https so the Secure cookie is accepted and echoed back.
+    with TestClient(app, base_url="https://testserver") as c:
+        r = c.post("/api/auth/register", json={"username": "sec", "password": "secret1"})
+        assert r.status_code == 200
+        assert "secure" in r.headers.get("set-cookie", "").lower()
+    app.dependency_overrides.clear()

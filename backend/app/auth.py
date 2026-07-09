@@ -8,6 +8,8 @@ signing secret is needed either.
 
 import hashlib
 import secrets
+import time
+from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.orm import Session
@@ -17,6 +19,26 @@ from .models import AuthSession
 SESSION_COOKIE = "educator_session"
 SESSION_DAYS = 30
 _PBKDF2_ITERATIONS = 200_000
+
+
+class RateLimiter:
+    """In-process sliding-window limiter, keyed by client. Enough to blunt
+    password brute-forcing on a single-worker server; not a distributed limiter."""
+
+    def __init__(self, max_attempts: int, window_seconds: float):
+        self.max_attempts = max_attempts
+        self.window = window_seconds
+        self._hits: dict[str, list[float]] = defaultdict(list)
+
+    def allow(self, key: str) -> bool:
+        now = time.monotonic()
+        hits = [t for t in self._hits[key] if now - t < self.window]
+        hits.append(now)
+        self._hits[key] = hits
+        return len(hits) <= self.max_attempts
+
+
+login_limiter = RateLimiter(max_attempts=10, window_seconds=60.0)
 
 
 def hash_password(password: str) -> str:
